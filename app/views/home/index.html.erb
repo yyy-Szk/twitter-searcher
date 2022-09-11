@@ -1,2 +1,25 @@
-<h1>Home#index</h1>
-<p>Find me in app/views/home/index.html.erb</p>
+<%# TODO: reactを使って、ajaxで通信する。通信している間は、画面になんか出したいけど、それは後でいい。 %>
+
+<h1>検索ページ</h1>
+
+<%= form_with(url: search_customers_path, method: :get, local: true) do |f| %>
+
+  <div style="margin-top: 30px; margin-left: 30px">
+    <%= f.select :search_type, TwitterSeacher.search_types, {}, { name: "conditions[0][search_type]" } %>
+    <%= f.text_field :seach_content, { name: "conditions[0][content]" } %>
+  </div>
+
+  <div style="margin-top: 30px; margin-left: 30px">
+    <%= f.select :search_type, TwitterSeacher.search_types, {}, { name: "conditions[1][search_type]" } %>
+    <%= f.text_field :seach_content, { name: "conditions[1][content]" } %>
+  </div>
+
+  <div style="margin-top: 30px; margin-left: 30px">
+    <%= f.submit "送信" %>
+  </div>
+
+<% end %>
+
+<% @results.each do |result| %>
+
+<% end %>
