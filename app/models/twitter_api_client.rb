@@ -7,23 +7,27 @@ class TwitterApiClient
   # include ActiveModel::Model
   # include ActiveModel::Attributes
   API_ENDPOINT = "https://api.twitter.com"
+  USERS_FIELDS = "public_metrics,id,username,description,name"
+  # created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld
 
   class Error < StandardError; end
   class ResponseError < Error; end
 
   attr_reader :access_token, :debug_mode
 
-  def initialize(access_token: nil, debug_mode: false)
+  def initialize(access_token: nil, debug_mode: true)
     @access_token = access_token
     @debug_mode = debug_mode
   end
 
   # TODO: とりあえず、現状は使わない
-  def fetch_followed_users_by(user_id:)
+  def fetch_followed_users_by(user_id:, next_token: nil)
     path = "/2/users/#{user_id}/followers"
     params = {
-      max_results: 1000
-    }
+      max_results: 1000,
+      "user.fields": USERS_FIELDS,
+      pagination_token: next_token
+    }.compact
     response = connection_get(path, params)
 
     parse(response)
@@ -33,7 +37,8 @@ class TwitterApiClient
   def fetch_following_users_by(user_id:)
     path = "/2/users/#{user_id}/following"
     params = {
-      max_results: 1000
+      max_results: 1000,
+      "user.fields": USERS_FIELDS
     }
     response = connection_get(path, params)
 
@@ -59,12 +64,11 @@ class TwitterApiClient
     path = "/2/users/#{user_id}/tweets"
     params = {
       start_time: Time.now.ago(1.month).strftime(iso8601_format),
-      max_results: 100,
+      max_results: 10, # いいねのやつが15分で75リクエストまでなので、一旦75ツイートを最大にする
       exclude: "retweets,replies",
       pagination_token: next_token
     }.compact
-    p params
-    response = connection_get(path)
+    response = connection_get(path, params)
 
     parse(response)
   end
@@ -74,8 +78,7 @@ class TwitterApiClient
     path = "/2/tweets/#{tweet_id}/liking_users"
     params = {
       pagination_token: next_token,
-      "user.fields": "public_metrics,id,username,description,name"
-      # created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld
+      "user.fields": USERS_FIELDS
     }.compact
     response = connection_get(path, params)
 

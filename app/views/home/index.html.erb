@@ -1,25 +1,43 @@
-<%# TODO: reactを使って、ajaxで通信する。通信している間は、画面になんか出したいけど、それは後でいい。 %>
 
-<h1>検索ページ</h1>
+<div class="home-wrapper">
+  <h1 style="margin: 30px 0 0 30px;">検索ページ</h1>
 
-<%= form_with(url: search_customers_path, method: :get, local: true) do |f| %>
+  <div style="margin-top: 50px; margin-left: 90px">
+    <h2>ユーザーを検索する</h2>
+  
+    <%= form_with(url: search_customers_path, method: :get, local: true, class: "search-form") do |f| %>
+      <div class="search-form-content">
+        <%= f.select :search_type, TwitterSearcher.search_types, {}, { name: "conditions[0][search_type]", class: "search0-type-field" } %>
+        <%= f.text_field :seach_content, { name: "conditions[0][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
 
-  <div style="margin-top: 30px; margin-left: 30px">
-    <%= f.select :search_type, TwitterSeacher.search_types, {}, { name: "conditions[0][search_type]" } %>
-    <%= f.text_field :seach_content, { name: "conditions[0][content]" } %>
+        <%= f.submit "送信" %>
+      </div>
+    <% end %>
+
+    <div class="search-results">
+    <% if @results.present? %>
+      <p class="result-count">ヒット数: <%= @results.count %></p>
+    <% end %>
+
+      <% @results.each do |result| %>
+        <div class="user-info">
+          <h3>
+            <a href=<%= "https://twitter.com/#{result["username"]}" %>>
+              <%= result["name"] %>
+              <span class="username"><%= "@#{result["username"]}  " %></span>
+              </a>
+          </h3>
+
+          <p class="description"><%= result["description"] %></p>
+
+          <p class="public-metrics">
+            フォロワー数: <%= result["public_metrics"]["followers_count"] %> /
+            フォロー数: <%= result["public_metrics"]["following_count"] %> /
+            ツイート数: <%= result["public_metrics"]["tweet_count"] %> /
+            リスト数: <%= result["public_metrics"]["listed_count"] %>
+          </p>
+        </div>
+      <% end %>
+    </div>
   </div>
-
-  <div style="margin-top: 30px; margin-left: 30px">
-    <%= f.select :search_type, TwitterSeacher.search_types, {}, { name: "conditions[1][search_type]" } %>
-    <%= f.text_field :seach_content, { name: "conditions[1][content]" } %>
-  </div>
-
-  <div style="margin-top: 30px; margin-left: 30px">
-    <%= f.submit "送信" %>
-  </div>
-
-<% end %>
-
-<% @results.each do |result| %>
-
-<% end %>
+</div>

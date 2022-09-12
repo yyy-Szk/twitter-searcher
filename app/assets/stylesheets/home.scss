@@ -1,3 +1,49 @@
 // Place all the styles related to the home controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: https://sass-lang.com/
+
+html {
+  background-color: silver;
+}
+
+.home-wrapper {
+  .search-form {
+    .search-form-content {
+      margin: 40px 0 0 30px;
+
+      .search-type-field {
+        width: 200px;
+      }
+      .content-field {
+        width: 400px;
+      }
+    }
+  }
+
+  .search-results {
+    margin-top: 70px;
+
+    .result-count {
+
+    }
+    .user-info {
+      width: 80vw;
+      margin-bottom: 70px;
+
+      .username {
+        font-style: italic;
+        font-size: 12px;
+      }
+
+      .public-metrics {
+        font-size: 12px;
+        text-align: right;
+      }
+
+      .description {
+        flex-wrap: wrap;
+      }
+    }
+  }
+}
+
