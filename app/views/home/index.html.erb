@@ -1,28 +1,30 @@
 
 <div class="home-wrapper">
-  <h1 style="margin: 30px 0 0 30px;">検索ページ</h1>
+  <h1 style="margin: 30px 0 0 30px;"><a href="/">検索ページ</a></h1>
 
   <div style="margin-top: 50px; margin-left: 90px">
     <h2>ユーザーを検索する</h2>
   
-    <%= form_with(url: search_customers_path, method: :get, local: true, class: "search-form") do |f| %>
+    <%= form_with(url: search_customers_path, local: true, class: "search-form") do |f| %>
       <div class="search-form-content">
         <%= f.select :search_type, TwitterSearcher.search_types, {}, { name: "conditions[0][search_type]", class: "search0-type-field" } %>
         <%= f.text_field :seach_content, { name: "conditions[0][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+
+       <!-- 絞り込み -->
 
         <%= f.submit "送信" %>
       </div>
     <% end %>
 
     <div class="search-results">
-    <% if @results.present? %>
-      <p class="result-count">ヒット数: <%= @results.count %></p>
-    <% end %>
+      <% if @results.present? %>
+        <p class="result-count">ヒット数: <%= @results.count %></p>
+      <% end %>
 
       <% @results.each do |result| %>
         <div class="user-info">
           <h3>
-            <a href=<%= "https://twitter.com/#{result["username"]}" %>>
+            <a href=<%= "https://twitter.com/#{result["username"]}" %> target="__blank">
               <%= result["name"] %>
               <span class="username"><%= "@#{result["username"]}  " %></span>
               </a>
@@ -31,8 +33,8 @@
           <p class="description"><%= result["description"] %></p>
 
           <p class="public-metrics">
-            フォロワー数: <%= result["public_metrics"]["followers_count"] %> /
             フォロー数: <%= result["public_metrics"]["following_count"] %> /
+            フォロワー数: <%= result["public_metrics"]["followers_count"] %> /
             ツイート数: <%= result["public_metrics"]["tweet_count"] %> /
             リスト数: <%= result["public_metrics"]["listed_count"] %>
           </p>

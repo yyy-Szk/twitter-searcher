@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   root 'home#index'
-  get "search_customers", to: 'home#search_customers'
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  # 一時的なもの
+  post "search_customers", to: 'home#search_customers'
+  get "results/:id", to: 'home#result'
 end

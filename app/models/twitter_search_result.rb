@@ -1,0 +1,2 @@
+class TwitterSearchResult < ApplicationRecord
+end

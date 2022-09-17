@@ -2,20 +2,18 @@
 
 require "faraday"
 require "json"
+require_relative "twitter_api_client/error"
 
 class TwitterApiClient
-  # include ActiveModel::Model
-  # include ActiveModel::Attributes
   API_ENDPOINT = "https://api.twitter.com"
   USERS_FIELDS = "public_metrics,id,username,description,name"
+  TWEET_FIELDS = "public_metrics"
+  # 設定可能な項目
   # created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld
-
-  class Error < StandardError; end
-  class ResponseError < Error; end
 
   attr_reader :access_token, :debug_mode
 
-  def initialize(access_token: nil, debug_mode: true)
+  def initialize(access_token:, debug_mode: false)
     @access_token = access_token
     @debug_mode = debug_mode
   end
@@ -51,8 +49,10 @@ class TwitterApiClient
   # users default: [], idだけは絶対取れるようにするとか
   # tweets default: [], idだけは絶対取れるようにするとか
   # こいつについては、URLからユーザーidを取り出すのに使用する
-  def fetch_user_by(user_name:)
-    path = "/2/users/by/username/#{user_name}"
+  def fetch_user_by(username)
+    username = retrieve_username(username)
+
+    path = "/2/users/by/username/#{username}"
     response = connection_get(path)
 
     parse(response)
@@ -64,16 +64,18 @@ class TwitterApiClient
     path = "/2/users/#{user_id}/tweets"
     params = {
       start_time: Time.now.ago(1.month).strftime(iso8601_format),
-      max_results: 10, # いいねのやつが15分で75リクエストまでなので、一旦75ツイートを最大にする
+      max_results: 100,
       exclude: "retweets,replies",
+      "tweet.fields": TWEET_FIELDS,
       pagination_token: next_token
     }.compact
     response = connection_get(path, params)
 
+    # 900リクエスト/15min。
+    # sleep(1)
     parse(response)
   end
 
-  # とりあえず、いいねした人を100人ずつ取ることにする = next-tokenは使用しない。いいロジックが浮かんだら使う
   def fetch_liking_users_by(tweet_id:, next_token: nil)
     path = "/2/tweets/#{tweet_id}/liking_users"
     params = {
@@ -82,6 +84,8 @@ class TwitterApiClient
     }.compact
     response = connection_get(path, params)
 
+    # 75リクエスト/15min
+    sleep(12)
     parse(response)
   end
 
@@ -102,7 +106,18 @@ class TwitterApiClient
   end
 
   def parse(response)
-    JSON.parse(response.body)
+    json = JSON.parse(response.body)
+
+    case response.status
+    when 200
+      json
+    when 429
+      reset_at = Time.at(response.headers["x-rate-limit-reset"])
+      message = json.map { "#{_1}: #{_2}" }.join(",\s")
+      raise TooManyRequestError.new(message, reset_at: reset_at)
+    else
+      raise ResponseError json.map { "#{_1}: #{_2}" }.join(",\s")
+    end
   end
 
   def authorization
@@ -116,5 +131,9 @@ class TwitterApiClient
       builder.response :logger if debug_mode
       builder.adapter Faraday.default_adapter
     end
+  end
+
+  def retrieve_username(username)
+    username.sub("https://twitter.com/", "").sub(/(\?.*)?$/, "")
   end
 end
