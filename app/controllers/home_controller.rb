@@ -24,6 +24,7 @@ class HomeController < ApplicationController
   def result
     result = TwitterSearchResult.find(params[:id])
     @results = result.payload
+    @progress_rate = result.progress_rate
 
     render "home/index"
   end

@@ -18,7 +18,7 @@
 
     <div class="search-results">
       <% if @results.present? %>
-        <p class="result-count">ヒット数: <%= @results.count %></p>
+        <p class="result-count">進行率: <%= @progress_rate %>% / ヒット数: <%= @results.count %></p>
       <% end %>
 
       <% @results.each do |result| %>

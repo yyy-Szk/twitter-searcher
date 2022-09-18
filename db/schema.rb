@@ -16,6 +16,7 @@ ActiveRecord::Schema.define(version: 2022_09_12_125535) do
   enable_extension "plpgsql"
 
   create_table "twitter_search_results", force: :cascade do |t|
+    t.integer "progress_rate", default: 0, null: false
     t.jsonb "payload", default: [], null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

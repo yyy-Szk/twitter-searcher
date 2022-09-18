@@ -3,8 +3,9 @@ class SearchTwitterUserJob < ApplicationJob
 
   def perform(result, conditions)
     # conditions.each do
-    twitter_searcher(result).search_users!(conditions)
-    # result.update()
+    twitter_searcher(result).search_liking_users_case(conditions)
+    # twitter_searcher(result).search_users!(conditions)
+    # result.update!(progress_rate: 0, payload: {})
     # end
   end
 
