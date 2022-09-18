@@ -2,8 +2,8 @@
 
 class TwitterSearcher
   # TODO: localeかなんかで、英語で設定 => 日本語変換を行う
-  USER_SEARCH_TYPES = { "最近いいねされたユーザー": 0 }.freeze
-  # USER_SEARCH_TYPES = { "最近いいねされたユーザー": 0, "フォローしているユーザー": 1 }.freeze
+  # USER_SEARCH_TYPES = { "最近いいねされたユーザー": 0 }.freeze
+  USER_SEARCH_TYPES = { "最近いいねしたユーザー": 0, "フォローしているユーザー": 1 }.freeze
 
   class << self
     def search_types
@@ -17,7 +17,7 @@ class TwitterSearcher
   end
 
   # TODO: 引数の形式チェックとかやるかどうか考える。ひとまずは、正しい引数が渡されることを期待する
-  def search_users!(conditions)
+  def search_users(conditions)
     # users = []
     conditions.each do |_, condition|
       next if condition[:content].blank?
@@ -39,7 +39,7 @@ class TwitterSearcher
     # users
   end
 
-  def search_liking_users_case(conditions)
+  def search_liking_users_case(conditions, narrow_down_conditions)
     conditions.each do |_, condition|
       next if condition[:content].blank?
 
@@ -51,7 +51,6 @@ class TwitterSearcher
       users = []
       next_token = nil
       tweets.each.with_index(1) do |tweet, i|
-        break if i == 10
         res = client.fetch_liking_users_by(tweet_id: tweet["id"], next_token: next_token)
   
         if liking_users = res["data"].presence
@@ -62,12 +61,39 @@ class TwitterSearcher
         if next_token && tweet.dig("public_metrics", "like_count") >= 100
           redo
         end
+
+        # ここで絞り込む。
+        # フォロワー一覧を持ってきて、
+        next_token_2 = nil
+        narrow_down_conditions.each do |_, narrow_down_condition|
+          case narrow_down_condition["type"]
+          when "0"
+            users
+          when "1"
+            @followed_users ||= begin
+              target_user_id = client.fetch_user_by(narrow_down_condition[:content]).dig("data", "id")
+              next_token_2 = nil
+              followed_users = []
+              loop do
+                res = client.fetch_followed_users_by(user_id: target_user_id, next_token: next_token_2)
+                followed_users += res["data"]
+                next_token_2 = res.dig("meta", "next_token")
+
+                break unless next_token_2
+              end
+
+              followed_users
+            end
+          end
+        end
+        users &= @followed_users
+
         p "====================="
         p "#{i}個め終わり"
         p "====================="
         next_token = nil
         progress_rate = (i/tweets.size.to_f) * 100
-        update_result_payload(progress_rate, users)        
+        update_result_payload(progress_rate, users)   
       end
     end
   end

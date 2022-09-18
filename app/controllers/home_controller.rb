@@ -13,7 +13,7 @@ class HomeController < ApplicationController
     # todo: user_id追加したい
     result = TwitterSearchResult.new
     if result.save
-      SearchTwitterUserJob.perform_later(result, twitter_search_params)
+      SearchTwitterUserJob.perform_later(result, search_condition_params, narrow_down_condition_params)
 
       redirect_to action: "result", id: result.id
     else
@@ -31,9 +31,13 @@ class HomeController < ApplicationController
 
   private
 
-  def twitter_search_params
+  def search_condition_params
     params[:conditions].permit!
     # params.require(:conditions).permit(:)
+  end
+
+  def narrow_down_condition_params
+    params[:narrow_down_conditions].permit!
   end
 
   def validate

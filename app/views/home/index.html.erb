@@ -7,12 +7,22 @@
   
     <%= form_with(url: search_customers_path, local: true, class: "search-form") do |f| %>
       <div class="search-form-content">
-        <%= f.select :search_type, TwitterSearcher.search_types, {}, { name: "conditions[0][search_type]", class: "search0-type-field" } %>
+
+        <p>以下、必須の条件<p>
+
         <%= f.text_field :seach_content, { name: "conditions[0][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+        を
+        <%= f.select :search_type, TwitterSearcher.search_types, {}, { name: "conditions[0][search_type]", class: "search0-type-field" } %>
 
-       <!-- 絞り込み -->
+        <p>かつ</p>
 
-        <%= f.submit "送信" %>
+        <p>以下、任意の条件</p>
+
+        <%= f.text_field :seach_content, { name: "narrow_down_conditions[0][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+        を
+        <%= f.select :search_type, TwitterSearcher.search_types, {}, { name: "narrow_down_conditions[0][type]", class: "search0-type-field" } %>
+
+        <%= f.submit "検索" %>
       </div>
     <% end %>
 

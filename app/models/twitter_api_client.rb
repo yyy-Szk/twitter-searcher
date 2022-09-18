@@ -18,7 +18,6 @@ class TwitterApiClient
     @debug_mode = debug_mode
   end
 
-  # TODO: とりあえず、現状は使わない
   def fetch_followed_users_by(user_id:, next_token: nil)
     path = "/2/users/#{user_id}/followers"
     params = {
@@ -27,6 +26,8 @@ class TwitterApiClient
       pagination_token: next_token
     }.compact
     response = connection_get(path, params)
+    # 15リクエスト/15min
+    sleep(60)
 
     parse(response)
   end
@@ -112,7 +113,7 @@ class TwitterApiClient
     when 200
       json
     when 429
-      reset_at = Time.at(response.headers["x-rate-limit-reset"])
+      reset_at = Time.at(response.headers["x-rate-limit-reset"].to_i)
       message = json.map { "#{_1}: #{_2}" }.join(",\s")
       raise TooManyRequestError.new(message, reset_at: reset_at)
     else
