@@ -54,7 +54,10 @@ class TwitterApiClient
     username = retrieve_username(username)
 
     path = "/2/users/by/username/#{username}"
-    response = connection_get(path)
+    params = {
+      "user.fields": USERS_FIELDS
+    }
+    response = connection_get(path, params)
 
     parse(response)
   end
