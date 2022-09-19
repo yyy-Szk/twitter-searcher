@@ -6,6 +6,7 @@ class SearchTwitterUserJob < ApplicationJob
     users_for_narrow_down = []
     # メソッド切り出し
     narrow_down_conditions.each.with_index(1) do |(_, condition), i|
+      next if condition[:content].empty?
       users = searcher(condition[:search_type], condition[:content]).search_users
       if i == 1
         users_for_narrow_down += users
@@ -16,11 +17,17 @@ class SearchTwitterUserJob < ApplicationJob
     p "絞り込み条件取得終了", "件数: #{users_for_narrow_down.size}"
 
     # メソッド切り出し
+    p "ユーザー取得開始"
     search_conditions.each do |_, condition|
+      next if condition[:content].empty?
+
       users = searcher(condition[:search_type], condition[:content]).search_users do |progress_rate, users|
-        result.update(progress_rate: progress_rate, payload: users & users_for_narrow_down)
+        payload = users_for_narrow_down.present? ? users & users_for_narrow_down : users
+       
+        result.update(progress_rate: progress_rate, payload: payload)
       end
     end
+    p "ユーザー取得終了"
   end
 
   private

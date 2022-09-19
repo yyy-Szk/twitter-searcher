@@ -1,8 +1,8 @@
 class HomeController < ApplicationController
+  before_action :set_empty_result, only: [:index, :search_customers]
   before_action :validate, only: :search_customers
 
   def index
-    @results = []
   end
 
   # TODO: 設計に迷ったので、一時的に追加。後ほど別のコントローラーに切り出したい
@@ -26,7 +26,7 @@ class HomeController < ApplicationController
     @results = result.payload
     @progress_rate = result.progress_rate
 
-    render "home/index"
+    render "home/result"
   end
 
   private
@@ -40,6 +40,14 @@ class HomeController < ApplicationController
     params[:narrow_down_conditions].permit!
   end
 
+  def set_empty_result
+    @results = []
+  end
+
   def validate
+    if search_condition_params.dig("0", "content").empty?
+      flash[:alert] = "検索対象のユーザーは、最低一つは入力してください。"
+      render action: "index" and return
+    end
   end
 end

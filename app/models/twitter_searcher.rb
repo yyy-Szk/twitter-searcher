@@ -3,10 +3,22 @@
 class TwitterSearcher
   # TODO: localeかなんかで、英語で設定 => 日本語変換を行う
   # USER_SEARCH_TYPES = { "最近いいねされたユーザー": 0 }.freeze
-  USER_SEARCH_TYPES = { "最近いいねしたユーザー": 0, "フォローしているユーザー": 1 }.freeze
+  USER_SEARCH_TYPES = {
+    "最近いいねしたユーザー": 0, "フォローしているユーザー": 1,
+    # "最近いいねしていないユーザー": 2, "フォローしていないユーザー": 3
+  }.freeze
 
   class << self
-    def search_types
+    def search_types_for_find
+      types = USER_SEARCH_TYPES.deep_dup
+      [:"フォローしていないユーザー", :"最近いいねしていないユーザー"].each do
+        types.delete(_1)
+      end
+
+      types
+    end
+
+    def search_types_for_narrow_down
       USER_SEARCH_TYPES
     end
   end

@@ -1,0 +1,35 @@
+
+<div class="home-wrapper">
+  <h1 style="margin: 30px 0 0 30px;"><a href="/">検索ページ</a></h1>
+
+  <div style="margin-top: 50px; margin-left: 90px">
+    <h2>検索結果</h2>
+
+    <p>取得したユーザーの情報が、随時掲載されます。</p>
+    <p>一定時間経過後に、再度画面を更新してください。</p>
+
+    <div class="search-results">
+      <p class="result-count">進行率: <%= @progress_rate || 0 %>% / ヒット数: <%= @results&.count || 0 %></p>
+
+      <% @results.each do |result| %>
+        <div class="user-info">
+          <h3>
+            <a href=<%= "https://twitter.com/#{result["username"]}" %> target="__blank">
+              <%= result["name"] %>
+              <span class="username"><%= "@#{result["username"]}  " %></span>
+              </a>
+          </h3>
+
+          <p class="description"><%= result["description"] %></p>
+
+          <p class="public-metrics">
+            フォロー数: <%= result["public_metrics"]["following_count"] %> /
+            フォロワー数: <%= result["public_metrics"]["followers_count"] %> /
+            ツイート数: <%= result["public_metrics"]["tweet_count"] %> /
+            リスト数: <%= result["public_metrics"]["listed_count"] %>
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

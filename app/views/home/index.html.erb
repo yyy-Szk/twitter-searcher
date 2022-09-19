@@ -4,52 +4,32 @@
 
   <div style="margin-top: 50px; margin-left: 90px">
     <h2>ユーザーを検索する</h2>
-  
+
     <%= form_with(url: search_customers_path, local: true, class: "search-form") do |f| %>
       <div class="search-form-content">
+
+        <% flash.each do |message_type, message| %>
+          <p class=<%= "flash-#{message_type}" %>><%= message %></p>
+        <% end %>
 
         <p>以下、必須の条件<p>
 
         <%= f.text_field :seach_content, { name: "conditions[0][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types, {}, { name: "conditions[0][search_type]", class: "search0-type-field" } %>
+        <%= f.select :search_type, TwitterSearcher.search_types_for_find, {}, { name: "conditions[0][search_type]", class: "search0-type-field" } %>
 
         <p>かつ</p>
 
         <p>以下、任意の条件</p>
+        <%# <p>（最終的には、ボタンを押したら絞り込み条件を一つ追加できるようにしたい。最大で３個くらいつけられるようにする。）</p>
+        <p>（ログイン機能を実装したら、ユーザーを検索している間は検索ができないようにする。）</p> %>
 
         <%= f.text_field :seach_content, { name: "narrow_down_conditions[0][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types, {}, { name: "narrow_down_conditions[0][search_type]", class: "search0-type-field" } %>
+        <%= f.select :search_type, TwitterSearcher.search_types_for_narrow_down, {}, { name: "narrow_down_conditions[0][search_type]", class: "search0-type-field" } %>
 
         <%= f.submit "検索" %>
       </div>
     <% end %>
-
-    <div class="search-results">
-      <% if @results.present? %>
-        <p class="result-count">進行率: <%= @progress_rate %>% / ヒット数: <%= @results.count %></p>
-      <% end %>
-
-      <% @results.each do |result| %>
-        <div class="user-info">
-          <h3>
-            <a href=<%= "https://twitter.com/#{result["username"]}" %> target="__blank">
-              <%= result["name"] %>
-              <span class="username"><%= "@#{result["username"]}  " %></span>
-              </a>
-          </h3>
-
-          <p class="description"><%= result["description"] %></p>
-
-          <p class="public-metrics">
-            フォロー数: <%= result["public_metrics"]["following_count"] %> /
-            フォロワー数: <%= result["public_metrics"]["followers_count"] %> /
-            ツイート数: <%= result["public_metrics"]["tweet_count"] %> /
-            リスト数: <%= result["public_metrics"]["listed_count"] %>
-          </p>
-        </div>
-      <% end %>
-    </div>
   </div>
 </div>

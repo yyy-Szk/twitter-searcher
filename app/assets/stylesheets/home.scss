@@ -11,6 +11,9 @@ html {
     .search-form-content {
       margin: 40px 0 0 30px;
 
+      .flash-alert {
+        color: red;
+      }
       .search-type-field {
         width: 200px;
       }
