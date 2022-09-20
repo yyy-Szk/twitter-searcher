@@ -9,10 +9,14 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
+      EDITOR: vi
+      TZ: Asia/Tokyo
     ports:
       - "3000:3000"
     depends_on:
       - db
+    tty: true
+    stdin_open: true
   db:
     image: postgres
     environment:
