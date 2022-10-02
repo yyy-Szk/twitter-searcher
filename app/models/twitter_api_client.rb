@@ -62,12 +62,12 @@ class TwitterApiClient
     parse(response)
   end
 
-  def fetch_tweets_by(user_id:, next_token: nil)
+  def fetch_tweets_by(user_id:, limit:, next_token: nil)
     iso8601_format = "%Y-%m-%dT%H:%M:%SZ"
 
     path = "/2/users/#{user_id}/tweets"
     params = {
-      start_time: Time.now.ago(1.month).strftime(iso8601_format),
+      start_time: Time.now.ago(limit).strftime(iso8601_format),
       max_results: 100,
       exclude: "retweets,replies",
       "tweet.fields": TWEET_FIELDS,
@@ -120,7 +120,7 @@ class TwitterApiClient
       message = json.map { "#{_1}: #{_2}" }.join(",\s")
       raise TooManyRequestError.new(message, reset_at: reset_at)
     else
-      raise ResponseError json.map { "#{_1}: #{_2}" }.join(",\s")
+      raise json.map { "#{_1}: #{_2}" }.join(",\s")
     end
   end
 

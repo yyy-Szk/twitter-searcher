@@ -13,7 +13,9 @@ class HomeController < ApplicationController
     # todo: user_id追加したい
     result = TwitterSearchResult.new
     if result.save
-      SearchTwitterUserJob.perform_later(result, search_condition_params, narrow_down_condition_params)
+      search_conditions = search_condition_params.delete_if { _1["content"].empty? }
+      narrow_down_conditions = narrow_down_condition_params.delete_if { _1["content"].empty? }
+      SearchTwitterUserJob.perform_later(result, search_conditions, narrow_down_conditions)
 
       redirect_to action: "result", id: result.id
     else
@@ -32,12 +34,16 @@ class HomeController < ApplicationController
   private
 
   def search_condition_params
-    params[:conditions].permit!
+    params[:conditions].map do
+      _1.permit(:content, :search_type)
+    end
     # params.require(:conditions).permit(:)
   end
 
   def narrow_down_condition_params
-    params[:narrow_down_conditions].permit!
+    params[:narrow_down_conditions].map do
+      _1.permit(:content, :search_type)
+    end
   end
 
   def set_empty_result
@@ -45,7 +51,10 @@ class HomeController < ApplicationController
   end
 
   def validate
-    if search_condition_params.dig("0", "content").empty?
+    if search_condition_params.dig(0, "content").empty?
+      p "=========="
+      p search_condition_params
+      p "=========="
       flash[:alert] = "検索対象のユーザーは、最低一つは入力してください。"
       render action: "index" and return
     end
