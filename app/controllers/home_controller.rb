@@ -51,7 +51,7 @@ class HomeController < ApplicationController
   end
 
   def validate
-    if search_condition_params.dig(0, "content").empty?
+    if search_condition_params.all? { _1["content"].empty? }
       p "=========="
       p search_condition_params
       p "=========="
