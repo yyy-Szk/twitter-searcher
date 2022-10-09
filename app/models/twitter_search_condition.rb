@@ -1,0 +1,2 @@
+class TwitterSearchCondition < ApplicationRecord
+end
