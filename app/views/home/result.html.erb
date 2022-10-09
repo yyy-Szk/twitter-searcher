@@ -9,7 +9,10 @@
     <p>一定時間経過後に、再度画面を更新してください。</p>
 
     <div class="search-results">
-      <p class="result-count">進行率: <%= @progress_rate == 100 ? "100%" : "現在取得中..." %> / ヒット数: <%= @results&.count || 0 %></p>
+      <p class="result-count">進行率: <%= @result.progress_rate == 100 ? "100%" : "現在取得中..." %> / ヒット数: <%= @result.payload&.count || 0 %></p>
+      <% if @result.progress_rate == 100 %>
+        <p class="result-count">結果: <%= @result.error_class.present? ? "取得に失敗しました" : "取得に成功しました" %> / エラーメッセージ: <%= @result.error_message || "なし" %></p>
+      <% end %>
 
       <h3>メイン条件</h3>
       <ul>

@@ -38,6 +38,9 @@ class SearchTwitterUserJob < ApplicationJob
     end
     p "ユーザー取得終了"
 
+  rescue => e
+    twitter_search_result.update error_class: e.class, error_message: e.message
+  ensure
     twitter_search_result.update progress_rate: 100
   end
 
