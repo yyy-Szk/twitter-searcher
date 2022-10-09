@@ -31,9 +31,11 @@
       <% if @narrowing_conditions.present? %>
         <ul>
           <% @narrowing_conditions.each do |condition| %>
-            <a href=<%= condition.content %> target="__blank"><%= condition.content %></a>
-            を
-            <%= condition.human_attribute_enum("search_type") %>
+            <li>
+              <a href=<%= condition.content %> target="__blank"><%= condition.content %></a>
+              を
+              <%= condition.human_attribute_enum("search_type") %>
+            </li>
           <% end %>
         </ul>
       <% else %>

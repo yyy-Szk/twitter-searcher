@@ -14,6 +14,8 @@ class SearchTwitterUserJob < ApplicationJob
     p "絞り込み条件取得開始"
     results = narrow_down_conditions.map do |condition|
       searcher(condition).search_users do |data, progress_rate|
+        p "絞り込み条件取得中"
+        
         # 進捗
         # twitter_search_result.update progrss_rate: progrss_rate
       end
@@ -25,13 +27,9 @@ class SearchTwitterUserJob < ApplicationJob
     search_conditions.each do |search_condition|
       searcher(search_condition).search_users do |result, progress_rate|
         results.each { result.calc(_1) }
+        p "ユーザー取得取得中"
 
-        payload =
-          if twitter_search_result.payload.present?
-            twitter_search_result.payload & result.data
-          else
-            twitter_search_result.payload + result.data
-          end
+        payload = twitter_search_result.payload | result.data
 
         twitter_search_result.update payload: twitter_search_result.payload | payload #, progress_rate
       end
