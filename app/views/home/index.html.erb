@@ -14,31 +14,32 @@
 
         <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types_for_find, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+
+        <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
         <br>
 
         <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types_for_find, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+        <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
         <br>
 
         <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types_for_find, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+        <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
         <br>
 
         <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types_for_find, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+        <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
         <br>
 
         <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types_for_find, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+        <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
         <p>かつ</p>
 
@@ -47,31 +48,31 @@
 
         <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types_for_narrow_down, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+        <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
         <br>
 
         <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types_for_narrow_down, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+        <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
         <br>
 
         <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types_for_narrow_down, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+        <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
         <br>
 
         <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types_for_narrow_down, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+        <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
         <br>
 
         <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
         を
-        <%= f.select :search_type, TwitterSearcher.search_types_for_narrow_down, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+        <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
         <%= f.submit "検索" %>
       </div>

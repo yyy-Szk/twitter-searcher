@@ -10,10 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_12_125535) do
+ActiveRecord::Schema.define(version: 2022_10_09_032941) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "twitter_search_conditions", force: :cascade do |t|
+    t.bigint "twitter_search_result_id", comment: "ツイッター検索結果ID"
+    t.integer "condition_type", comment: "条件の種類: 0: メイン条件, 1: 絞り込み条件"
+    t.integer "search_type", null: false, comment: "検索条件（検索の種類）: 0: 直近1ヶ月にいいねしたユーザー, etc..."
+    t.text "content", default: "", null: false, comment: "検索条件(検索の対象)"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["twitter_search_result_id"], name: "index_twitter_search_conditions_on_twitter_search_result_id"
+  end
 
   create_table "twitter_search_results", force: :cascade do |t|
     t.integer "progress_rate", default: 0, null: false
@@ -22,4 +32,5 @@ ActiveRecord::Schema.define(version: 2022_09_12_125535) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "twitter_search_conditions", "twitter_search_results"
 end
