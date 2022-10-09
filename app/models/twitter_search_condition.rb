@@ -22,4 +22,10 @@ class TwitterSearchCondition < ApplicationRecord
       TwitterSearchCondition.search_types.dup
     end
   end
+
+  def operator
+    if search_type.start_with?("not_") then "-"
+    else "&"
+    end 
+  end
 end

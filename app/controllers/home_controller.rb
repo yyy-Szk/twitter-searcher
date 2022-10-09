@@ -11,11 +11,30 @@ class HomeController < ApplicationController
     # redisのdockerレイヤ追加。
     #  Tweet.new(tweet_id, liking_users_json)
     # todo: user_id追加したい
+    search_conditions = search_condition_params.delete_if { _1["content"].empty? }
+    narrow_down_conditions = narrow_down_condition_params.delete_if { _1["content"].empty? }
+
     result = TwitterSearchResult.new
+    search_conditions.each do
+      result.twitter_search_conditions.new(
+        condition_type: :main,
+        content: _1["content"],
+        # TODO: to_iは一時的なものとして、もっといい対応方法がないか考える
+        search_type: _1["search_type"].to_i
+      )
+    end
+
+    narrow_down_conditions.each do
+      result.twitter_search_conditions.new(
+        condition_type: :narrowing,
+        content: _1["content"],
+        # TODO: to_iは一時的なものとして、もっといい対応方法がないか考える
+        search_type: _1["search_type"].to_i
+      )
+    end
+    
     if result.save
-      search_conditions = search_condition_params.delete_if { _1["content"].empty? }
-      narrow_down_conditions = narrow_down_condition_params.delete_if { _1["content"].empty? }
-      SearchTwitterUserJob.perform_later(result, search_conditions, narrow_down_conditions)
+      SearchTwitterUserJob.perform_later(result)
 
       redirect_to action: "result", id: result.id
     else
@@ -27,6 +46,8 @@ class HomeController < ApplicationController
     result = TwitterSearchResult.find(params[:id])
     @results = result.payload
     @progress_rate = result.progress_rate
+    @main_conditions = result.twitter_search_conditions.condition_type_main
+    @narrowing_conditions = result.twitter_search_conditions.condition_type_narrowing
 
     render "home/result"
   end

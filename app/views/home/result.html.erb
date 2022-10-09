@@ -11,6 +11,32 @@
     <div class="search-results">
       <p class="result-count">進行率: <%= @progress_rate == 100 ? "100%" : "現在取得中..." %> / ヒット数: <%= @results&.count || 0 %></p>
 
+      <h3>メイン条件</h3>
+      <ul>
+        <% @main_conditions.each do |condition| %>
+          <li>
+            <a href=<%= condition.content %> target="__blank"><%= condition.content %></a>
+            を
+            <%= condition.human_attribute_enum("search_type") %>
+          </li>
+        <% end %>
+      </ul>
+
+
+      <h3>絞り込み条件</h3>
+
+      <% if @narrowing_conditions.present? %>
+        <ul>
+          <% @narrowing_conditions.each do |condition| %>
+            <a href=<%= condition.content %> target="__blank"><%= condition.content %></a>
+            を
+            <%= condition.human_attribute_enum("search_type") %>
+          <% end %>
+        </ul>
+      <% else %>
+        なし
+      <% end %>
+
       <% @results.each do |result| %>
         <div class="user-info">
           <h3>

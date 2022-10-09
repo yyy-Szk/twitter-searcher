@@ -1,28 +1,19 @@
 # frozen_string_literal: true
 
 class TwitterSearcher
-  # operator, condition, result
   class Result
     attr_reader :condition
     attr_accessor :data
 
-    # 同じインスタンスを渡すことで、そいつを利用して計算する
-    # 「-」「&」「|」などを渡して、自分の結果に対してなんかできる
+    delegate :operator, to: :@twitter_search_condition
 
-    def initialize(condition)
-      @condition = condition
+    def initialize(twitter_search_condition)
+      @twitter_search_condition = twitter_search_condition
       @data = []
     end
 
     def calc(other_result)
       @data = @data.send(other_result.operator, other_result.data)
-    end
-
-    def operator
-      case condition[:search_type]
-      when "0", "1", "2", "6" then "&"
-      when "3", "4", "5", "7" then "-"
-      end
     end
   end
 
@@ -59,23 +50,24 @@ class TwitterSearcher
 
   attr_reader :result
 
-  def initialize(search_type, search_condition, access_token)
-    @search_type = search_type
-    @search_condition = search_condition
+  def initialize(twitter_search_condition, access_token)
+    @twitter_search_condition = twitter_search_condition
+    # @search_type = search_type
+    # @search_condition = search_condition
     @access_token = access_token
   end
 
   # TODO: 引数の形式チェックとかやるかどうか考える。ひとまずは、正しい引数が渡されることを期待する
   # @param [Hash] condition
   def search_users(&block)
-    case @search_type
-    when "0", "3"
+    case @twitter_search_condition.search_type
+    when "liked_in_the_last_month", "not_liked_in_the_last_month"
       search_liking_users(1.month, &block)
-    when "1", "4"
+    when "liked_in_the_last_two_month", "not_liked_in_the_last_two_month"
       search_liking_users(2.months, &block)
-    when "2", "5"
+    when "liked_in_the_last_three_month", "not_liked_in_the_last_three_month"
       search_liking_users(3.months, &block)
-    when "6", "7" # フォローしているユーザー
+    when "following", "not_following"
       search_followed_users(&block)
     else
       []
@@ -85,13 +77,13 @@ class TwitterSearcher
   private
 
   def search_liking_users(limit)
-    # @search_condition には、ユーザーのプロフィールurlが入っている想定
-    target_user_id = client.fetch_user_by(@search_condition).dig("data", "id")
+    # @twitter_search_condition#content には、ユーザーのプロフィールurlが入っている想定
+    target_user_id = client.fetch_user_by(@twitter_search_condition.content).dig("data", "id")
     tweets = client.fetch_tweets_by(user_id: target_user_id, limit: limit)["data"] || []
 
     # ツイートごとに検索する感じ。
     next_token = nil
-    result = Result.new(@search_condition)
+    result = Result.new(@twitter_search_condition)
     tweets.each.with_index(1) do |tweet, i|
       res = client.fetch_liking_users_by(tweet_id: tweet["id"], next_token: next_token)
 
@@ -116,13 +108,13 @@ class TwitterSearcher
   end
 
   def search_followed_users
-    target_user = client.fetch_user_by(@search_condition)["data"]
+    target_user = client.fetch_user_by(@twitter_search_condition.content)["data"]
     target_id = target_user["id"]
     target_follower_count = target_user.dig("public_metrics", "followers_count")
 
     next_token = nil
     followed_users = []
-    result = Result.new({ search_type: @search_type, content: @search_condition })
+    result = Result.new(@twitter_search_condition)
     loop do
       res = client.fetch_followed_users_by(user_id: target_id, next_token: next_token)
       followed_users += res["data"]
