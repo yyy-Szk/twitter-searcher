@@ -1,5 +1,5 @@
 class TwitterSearchCondition < ApplicationRecord
-  belongs_to :twitter_search_result
+  belongs_to :twitter_search_process
 
   enum condition_type: { main: 0, narrowing: 1 }, _prefix: true
   enum search_type: {

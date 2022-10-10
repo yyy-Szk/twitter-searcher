@@ -1,3 +1,3 @@
 class TwitterSearchResult < ApplicationRecord
-  has_many :twitter_search_conditions
+  belongs_to :twitter_search_process
 end

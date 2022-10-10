@@ -14,9 +14,9 @@ class HomeController < ApplicationController
     search_conditions = search_condition_params.delete_if { _1["content"].empty? }
     narrow_down_conditions = narrow_down_condition_params.delete_if { _1["content"].empty? }
 
-    result = TwitterSearchResult.new
+    process = TwitterSearchProcess.new(user: User.find(1))
     search_conditions.each do
-      result.twitter_search_conditions.new(
+      process.twitter_search_conditions.new(
         condition_type: :main,
         content: _1["content"],
         # TODO: to_iは一時的なものとして、もっといい対応方法がないか考える
@@ -25,26 +25,26 @@ class HomeController < ApplicationController
     end
 
     narrow_down_conditions.each do
-      result.twitter_search_conditions.new(
+      process.twitter_search_conditions.new(
         condition_type: :narrowing,
         content: _1["content"],
         # TODO: to_iは一時的なものとして、もっといい対応方法がないか考える
         search_type: _1["search_type"].to_i
       )
     end
-    
-    if result.save
-      SearchTwitterUserJob.perform_later(result)
 
-      redirect_to action: "result", id: result.id
+    if process.save
+      SearchTwitterUserJob.perform_later(process)
+
+      redirect_to action: "result", id: process.id
     else
       redirect_to action: "index"
     end
   end
 
   def result
-    @result = TwitterSearchResult.find(params[:id])
-    @results = @result.payload
+    @result = TwitterSearchProcess.find(params[:id])
+    @results = @result.twitter_search_results
     @main_conditions = @result.twitter_search_conditions.condition_type_main
     @narrowing_conditions = @result.twitter_search_conditions.condition_type_narrowing
 
