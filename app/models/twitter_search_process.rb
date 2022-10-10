@@ -1,0 +1,2 @@
+class TwitterSearchProcess < ApplicationRecord
+end
