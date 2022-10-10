@@ -19,7 +19,7 @@ class SearchTwitterUserJob < ApplicationJob
       end
     end
 
-    p "絞り込み条件取得終了", results[0].data.size
+    p "絞り込み条件取得終了"
     p "ユーザー取得開始"
 
     # 本番ユーザー取得
@@ -44,7 +44,8 @@ class SearchTwitterUserJob < ApplicationJob
     p "ユーザー取得終了"
 
   rescue => e
-    twitter_search_process.update error_class: e.class, error_message: e.message
+    error_class = "#{e.class} / #{e.backtrace}"
+    twitter_search_process.update error_class: , error_message: e.message
   ensure
     twitter_search_process.update progress_rate: 100
   end
