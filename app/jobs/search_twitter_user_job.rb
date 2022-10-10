@@ -29,8 +29,9 @@ class SearchTwitterUserJob < ApplicationJob
         results.each { result.calc(_1) }
         p "ユーザー取得取得中"
 
-        payload = twitter_search_result.payload | result.data
+        return if result.data.blank?
 
+        payload = twitter_search_result.payload | result.data
         twitter_search_result.update payload: twitter_search_result.payload | payload #, progress_rate
       end
     end

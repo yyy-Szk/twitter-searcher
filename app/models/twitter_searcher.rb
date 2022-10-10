@@ -88,7 +88,6 @@ class TwitterSearcher
       res = client.fetch_liking_users_by(tweet_id: tweet["id"], next_token: next_token)
 
       if liking_users = res["data"].presence
-        users |= liking_users
         result.data |= liking_users
       end
 
@@ -99,9 +98,8 @@ class TwitterSearcher
 
       Rails.logger.info "#{i}/#{tweets.count}件目の取得が終了"
 
-
       progress_rate = (i/tweets.size.to_f) * 100
-      yield(result, progress_rate) if block_given?
+      yield(result, progress_rate) if block_given? && liking_users.present?
     end
 
     result
