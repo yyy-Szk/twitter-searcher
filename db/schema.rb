@@ -10,29 +10,49 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_09_072742) do
+ActiveRecord::Schema.define(version: 2022_10_09_032941) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "twitter_search_conditions", force: :cascade do |t|
-    t.bigint "twitter_search_result_id", comment: "ツイッター検索結果ID"
+    t.bigint "twitter_search_process_id", comment: "ツイッター検索プロセスID"
     t.integer "condition_type", comment: "条件の種類: 0: メイン条件, 1: 絞り込み条件"
     t.integer "search_type", null: false, comment: "検索条件（検索の種類）: 0: 直近1ヶ月にいいねしたユーザー, etc..."
     t.text "content", default: "", null: false, comment: "検索条件(検索の対象)"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["twitter_search_result_id"], name: "index_twitter_search_conditions_on_twitter_search_result_id"
+    t.index ["twitter_search_process_id"], name: "index_twitter_search_conditions_on_twitter_search_process_id"
+  end
+
+  create_table "twitter_search_processes", force: :cascade do |t|
+    t.bigint "user_id", comment: "ユーザーID"
+    t.integer "progress_rate", default: 0, null: false, comment: "進行率"
+    t.string "error_class", comment: "エラークラス"
+    t.string "error_message", comment: "エラーメッセージ"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_id"], name: "index_twitter_search_processes_on_user_id"
   end
 
   create_table "twitter_search_results", force: :cascade do |t|
+    t.bigint "twitter_search_process_id", comment: "ツイッター検索プロセスID"
     t.integer "progress_rate", default: 0, null: false
-    t.jsonb "payload", default: [], null: false
+    t.jsonb "data", default: [], null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "error_class"
-    t.string "error_message"
+    t.index ["twitter_search_process_id"], name: "index_twitter_search_results_on_twitter_search_process_id"
   end
 
-  add_foreign_key "twitter_search_conditions", "twitter_search_results"
+  create_table "users", force: :cascade do |t|
+    t.string "twitter_user_id", comment: "TwitterのユーザーID"
+    t.string "twitter_username", comment: "Twitterのユーザー名"
+    t.string "twitter_access_token", comment: "Twitterのアクセストークン"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  add_foreign_key "twitter_search_conditions", "twitter_search_processes"
+  add_foreign_key "twitter_search_processes", "users"
+  add_foreign_key "twitter_search_results", "twitter_search_processes"
 end
