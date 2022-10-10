@@ -43,10 +43,10 @@ class HomeController < ApplicationController
   end
 
   def result
-    @result = TwitterSearchProcess.find(params[:id])
-    @results = @result.twitter_search_results
-    @main_conditions = @result.twitter_search_conditions.condition_type_main
-    @narrowing_conditions = @result.twitter_search_conditions.condition_type_narrowing
+    @process = TwitterSearchProcess.find(params[:id])
+    @results = TwitterSearchResult.where(twitter_search_process: @process).page(params[:page]).per(3)
+    @main_conditions = @process.twitter_search_conditions.condition_type_main
+    @narrowing_conditions = @process.twitter_search_conditions.condition_type_narrowing
 
     render "home/result"
   end

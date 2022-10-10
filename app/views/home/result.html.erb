@@ -8,12 +8,7 @@
     <p>取得したユーザーの情報が、随時掲載されます。</p>
     <p>一定時間経過後に、再度画面を更新してください。</p>
 
-    <div class="search-results">
-      <p class="result-count">進行率: <%= @result.progress_rate == 100 ? "100%" : "現在取得中..." %> / ヒット数: <%= @results.sum { _1.data.count } || 0 %></p>
-      <% if @result.progress_rate == 100 %>
-        <p class="result-count">結果: <%= @result.error_class.present? ? "取得に失敗しました" : "取得に成功しました" %> / エラーメッセージ: <%= @result.error_message || "なし" %></p>
-      <% end %>
-
+    <div>
       <h3>メイン条件</h3>
       <ul>
         <% @main_conditions.each do |condition| %>
@@ -24,7 +19,6 @@
           </li>
         <% end %>
       </ul>
-
 
       <h3>絞り込み条件</h3>
 
@@ -41,6 +35,20 @@
       <% else %>
         なし
       <% end %>
+    </div>
+
+    <div style="margin: 50px 0;">
+      <p class="result-count">進行率: <%= @process.progress_rate == 100 ? "100%" : "現在取得中..." %> / ヒット数: <%= @results.sum { _1.data.count } || 0 %></p>
+      <% if @process.progress_rate == 100 %>
+        <p class="result-count">結果: <%= @process.error_class.present? ? "取得に失敗しました" : "取得に成功しました" %> / エラーメッセージ: <%= @process.error_message || "なし" %></p>
+      <% end %>
+    </div>
+
+       <%= paginate @results %>
+
+
+    <div class="search-results">
+
 
       <% @results.each do |twitter_search_result| %>
      

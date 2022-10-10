@@ -25,10 +25,8 @@ class SearchTwitterUserJob < ApplicationJob
     # 本番ユーザー取得
     search_conditions.inject([]) do |feched_users, search_condition|
       search_result = searcher(search_condition).search_users do |result, progress_rate|
-        p result.data.size
         results.each { result.calc(_1) }
         p "ユーザー取得取得中"
-        p result.data.size
 
         data = result.data - feched_users
 
