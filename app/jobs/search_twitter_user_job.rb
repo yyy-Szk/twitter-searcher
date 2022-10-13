@@ -26,15 +26,14 @@ class SearchTwitterUserJob < ApplicationJob
     search_conditions.inject([]) do |feched_users, search_condition|
       search_result = searcher(search_condition).search_users do |result, progress_rate|
         results.each { result.calc(_1) }
-        p "ユーザー取得取得中"
+        p "ユーザー取得中"
 
-        data = result.data - feched_users
-
-        return if data.blank?
-
-        TwitterSearchResult.create(twitter_search_process: twitter_search_process, data: data)
-        # payload = twitter_search_process.payload | result.data
-        # twitter_search_process.update payload: twitter_search_process.payload | payload #, progress_rate
+        data = result.data.select { feched_users.pluck("username").exclude?(_1["username"]) }
+        if data.present?
+          TwitterSearchResult.create(twitter_search_process: twitter_search_process, data: data)
+          # payload = twitter_search_process.payload | result.data
+          # twitter_search_process.update payload: twitter_search_process.payload | payload #, progress_rate
+        end
       end
 
       feched_users | search_result.data

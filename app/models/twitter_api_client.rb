@@ -76,7 +76,7 @@ class TwitterApiClient
     response = connection_get(path, params)
 
     # 900リクエスト/15min。
-    # sleep(1)
+    sleep(1)
     parse(response)
   end
 
