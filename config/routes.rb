@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get 'sessions/new'
+  get 'sessions/create'
+  get 'sessions/destroy'
   root 'home#index'
   # 一時的なもの
   post "search_customers", to: 'home#search_customers'
