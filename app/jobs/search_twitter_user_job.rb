@@ -42,7 +42,7 @@ class SearchTwitterUserJob < ApplicationJob
 
   rescue => e
     error_class = "#{e.class} / #{e.backtrace}"
-    twitter_search_process.update error_class: , error_message: e.message
+    twitter_search_process.update error_class: error_class, error_message: e.message
   ensure
     twitter_search_process.update progress_rate: 100
   end
