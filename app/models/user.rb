@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   has_many :twitter_search_process, dependent: :destroy
 
+  has_secure_password
+
   def self.find_or_create_by_oauth(omniauth_params)
     user = find_or_initialize_by(twitter_user_id: omniauth_params[:uid]) do |user|
       user.twitter_user_id = omniauth_params[:uid]

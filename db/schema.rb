@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_10_09_032941) do
+ActiveRecord::Schema.define(version: 2022_10_14_084752) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -50,6 +50,9 @@ ActiveRecord::Schema.define(version: 2022_10_09_032941) do
     t.string "twitter_access_token", comment: "Twitterのアクセストークン"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "uid", comment: "ユーザーID"
+    t.string "password_digest", comment: "パスワード"
+    t.string "twitter_refresh_token", comment: "Twitterのリフレッシュトークン"
   end
 
   add_foreign_key "twitter_search_conditions", "twitter_search_processes"
