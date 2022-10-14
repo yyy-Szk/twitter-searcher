@@ -74,11 +74,12 @@ class TwitterSearcher
     # ツイートごとに検索する感じ。
     next_token = nil
     result = Result.new(@twitter_search_condition)
+    liking_users = []
     tweets.each.with_index(1) do |tweet, i|
       res = client.fetch_liking_users_by(tweet_id: tweet["id"], next_token: next_token)
 
-      if liking_users = res["data"].presence
-        liking_users -= result.data
+      if res["data"].present?
+        liking_users |= res["data"] 
         result.data |= liking_users
       end
 
@@ -91,6 +92,7 @@ class TwitterSearcher
 
       progress_rate = 0#(i/tweets.size.to_f) * 100
       yield(Result.new(@twitter_search_condition, liking_users), progress_rate) if block_given? && liking_users.present?
+      liking_users = []
     end
 
     result
