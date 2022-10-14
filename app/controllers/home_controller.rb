@@ -14,7 +14,7 @@ class HomeController < ApplicationController
     search_conditions = search_condition_params.delete_if { _1["content"].empty? }
     narrow_down_conditions = narrow_down_condition_params.delete_if { _1["content"].empty? }
 
-    process = TwitterSearchProcess.new(user: User.find(1))
+    process = TwitterSearchProcess.new(user: current_user)
     search_conditions.each do
       process.twitter_search_conditions.new(
         condition_type: :main,

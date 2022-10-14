@@ -5,6 +5,9 @@
   <div style="margin-top: 50px; margin-left: 90px">
     <h2>ユーザーを検索する</h2>
 
+    <%= link_to 'ログイン', "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=LXVTR1NCV01ORXlDeF9HWnZUUU06MTpjaQ&redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2Fauth%2Ftwitter%2Fcallback&scope=tweet.read%20users.read%20like.read%20follows.read%20follows.write%20offline.access&state=abc&code_challenge=abc&code_challenge_method=plain", method: :get %>
+
+
     <%= form_with(url: search_customers_path, local: true, class: "search-form") do |f| %>
       <div class="search-form-content">
 
