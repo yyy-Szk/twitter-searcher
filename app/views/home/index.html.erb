@@ -2,83 +2,92 @@
 <div class="home-wrapper">
   <h1 style="margin: 30px 0 0 30px;"><a href="/">検索ページ</a></h1>
 
-  <div style="margin-top: 50px; margin-left: 90px">
-    <h2>ユーザーを検索する</h2>
+  <% if logged_in? %>
+    <% if current_user.twitter_refresh_token.present? %>
+    <div style="margin-top: 50px; margin-left: 90px">
+      <h2>ユーザーを検索する</h2>
 
-    <%= link_to 'ログイン', "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=LXVTR1NCV01ORXlDeF9HWnZUUU06MTpjaQ&redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2Fauth%2Ftwitter%2Fcallback&scope=tweet.read%20users.read%20like.read%20follows.read%20follows.write%20offline.access&state=abc&code_challenge=abc&code_challenge_method=plain", method: :get %>
 
+      <%= form_with(url: search_customers_path, local: true, class: "search-form") do |f| %>
+        <div class="search-form-content">
 
-    <%= form_with(url: search_customers_path, local: true, class: "search-form") do |f| %>
-      <div class="search-form-content">
+          <% flash.each do |message_type, message| %>
+            <p class=<%= "flash-#{message_type}" %>><%= message %></p>
+          <% end %>
 
-        <% flash.each do |message_type, message| %>
-          <p class=<%= "flash-#{message_type}" %>><%= message %></p>
-        <% end %>
+          <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+          を
 
-        <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-        を
+          <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
-        <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+          <br>
 
-        <br>
+          <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+          を
+          <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
-        <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-        を
-        <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+          <br>
 
-        <br>
+          <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+          を
+          <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
-        <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-        を
-        <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+          <br>
 
-        <br>
+          <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+          を
+          <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
-        <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-        を
-        <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+          <br>
 
-        <br>
+          <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+          を
+          <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
-        <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-        を
-        <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+          <p>かつ</p>
 
-        <p>かつ</p>
+          <%# <p>（最終的には、ボタンを押したら絞り込み条件を一つ追加できるようにしたい。最大で３個くらいつけられるようにする。）</p>
+          <p>（ログイン機能を実装したら、ユーザーを検索している間は検索ができないようにする。）</p> %>
 
-        <%# <p>（最終的には、ボタンを押したら絞り込み条件を一つ追加できるようにしたい。最大で３個くらいつけられるようにする。）</p>
-        <p>（ログイン機能を実装したら、ユーザーを検索している間は検索ができないようにする。）</p> %>
+          <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+          を
+          <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
-        <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-        を
-        <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+          <br>
 
-        <br>
+          <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+          を
+          <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
-        <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-        を
-        <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+          <br>
 
-        <br>
+          <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+          を
+          <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
-        <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-        を
-        <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+          <br>
 
-        <br>
+          <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+          を
+          <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
-        <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-        を
-        <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+          <br>
 
-        <br>
+          <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+          を
+          <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
-        <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-        を
-        <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
-
-        <%= f.submit "検索" %>
-      </div>
+          <%= f.submit "検索" %>
+        </div>
+      <% end %>
+    </div>
+    <% else %>
+      <% auth_url = "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=LXVTR1NCV01ORXlDeF9HWnZUUU06MTpjaQ&redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2Fauth%2Ftwitter%2Fcallback&scope=tweet.read%20users.read%20like.read%20follows.read%20follows.write%20offline.access&state=abc&code_challenge=abc&code_challenge_method=plain" %>
+      <p>検索するには、<%= link_to 'Twitter認証', auth_url, method: :get %>をしてください</p>
     <% end %>
-  </div>
+  <% else %>
+
+    <p><%= link_to "ログイン", login_path %>してください</p>
+
+  <% end %>
 </div>

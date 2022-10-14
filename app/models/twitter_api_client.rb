@@ -11,11 +11,42 @@ class TwitterApiClient
   # 設定可能な項目
   # created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld
 
-  attr_reader :access_token, :debug_mode
+  class << self
+    def access_token_expired?(access_token_fetch_date)
+      access_token_fetch_date > Time.now.ago(1.hour)
+    end
+  end
 
-  def initialize(access_token:, debug_mode: false)
+  attr_reader :access_token, :refresh_token, :debug_mode
+
+  def initialize(access_token:, refresh_token:, debug_mode: false)
     @access_token = access_token
+    @refresh_token = refresh_token
     @debug_mode = debug_mode
+    twitter_credentials = Rails.application.credentials.twitter
+    @client_id = twitter_credentials.dig(:oauth, :client_id)
+    @client_secret = twitter_credentials.dig(:oauth, :client_secret)
+  end
+
+  def refresh_access_token!
+    path = "/2/oauth2/token"
+    params = {
+      grant_type: "refresh_token",
+      refresh_token: refresh_token,
+      # client_id: "LXVTR1NCV01ORXlDeF9HWnZUUU06MTpjaQ" # TODO: クライアントid
+    }
+    conn = Faraday.new(url: "https://api.twitter.com", params: params) do |builder|
+      builder.headers["Content-Type"] = "application/x-www-form-urlencoded"
+      builder.request :authorization, :basic, @client_id, @client_secret
+      builder.adapter Faraday.default_adapter
+    end
+    res = conn.post("/2/oauth2/token")
+
+    parsed_res = parse(res)
+    @access_token = parsed_res["access_token"]
+    @refresh_token = parsed_res["refresh_token"]
+
+    self
   end
 
   def fetch_followed_users_by(user_id:, next_token: nil)

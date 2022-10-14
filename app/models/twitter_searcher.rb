@@ -32,11 +32,14 @@ class TwitterSearcher
     end
   end
 
-  attr_reader :result
+  attr_reader :result, :user
 
-  def initialize(twitter_search_condition, access_token)
+  def initialize(twitter_search_condition, user)
     @twitter_search_condition = twitter_search_condition
-    @access_token = access_token
+    @access_token = user.twitter_access_token
+    @refresh_token = user.twitter_refresh_token
+    @fetched_access_token_at = user.fetched_access_token_at
+    @user = user
   end
 
   # TODO: 引数の形式チェックとかやるかどうか考える。ひとまずは、正しい引数が渡されることを期待する
@@ -64,6 +67,8 @@ class TwitterSearcher
     tweets = []
     next_token = nil
     100.times do
+      update_client_access_token_if_needed!
+
       res = client.fetch_tweets_by(user_id: target_user_id, limit: limit, next_token: next_token)
       tweets.concat(res["data"])
 
@@ -76,6 +81,8 @@ class TwitterSearcher
     result = Result.new(@twitter_search_condition)
     liking_users = []
     tweets.each.with_index(1) do |tweet, i|
+      update_client_access_token_if_needed!
+
       res = client.fetch_liking_users_by(tweet_id: tweet["id"], next_token: next_token)
 
       if res["data"].present?
@@ -107,6 +114,8 @@ class TwitterSearcher
     followed_users = []
     result = Result.new(@twitter_search_condition)
     loop do
+      update_client_access_token_if_needed!
+
       res = client.fetch_followed_users_by(user_id: target_id, next_token: next_token)
       followed_users = res["data"]
       result.data += res["data"]
@@ -123,6 +132,19 @@ class TwitterSearcher
   end
 
   def client
-    @_client ||= TwitterApiClient.new(access_token: @access_token)
+    @client ||= TwitterApiClient.new(access_token: @access_token, refresh_token: @refresh_token)
+  end
+
+  def update_client_access_token_if_needed!
+    if @fetched_access_token_at < Time.now.ago(1.hour)
+      @client = client.refresh_access_token!
+      @fetched_access_token_at = Time.now
+
+      user.update(
+        twitter_access_token: @client.access_token,
+        twitter_refresh_token: @client.refresh_token,
+        fetched_access_token_at: @fetched_access_token_at
+      )
+    end
   end
 end

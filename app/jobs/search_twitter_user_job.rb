@@ -8,11 +8,13 @@ class SearchTwitterUserJob < ApplicationJob
   def perform(twitter_search_process)
     search_conditions = twitter_search_process.twitter_search_conditions.condition_type_main
     narrow_down_conditions = twitter_search_process.twitter_search_conditions.condition_type_narrowing
-    access_token = twitter_search_process.user.twitter_access_token
+    current_user = twitter_search_process.user
+    # access_token = current_user.twitter_access_token
+    # refresh_token = current_user.twitter_refresh_token
 
     p "絞り込み条件取得開始"
     results = narrow_down_conditions.map do |condition|
-      searcher(condition, access_token).search_users do |data, progress_rate|
+      searcher(condition, current_user).search_users do |data, progress_rate|
         p "絞り込み条件取得中"
         
         # 進捗
@@ -25,7 +27,7 @@ class SearchTwitterUserJob < ApplicationJob
 
     # 本番ユーザー取得
     search_conditions.inject([]) do |feched_users, search_condition|
-      search_result = searcher(search_condition, access_token).search_users do |result, progress_rate|
+      search_result = searcher(search_condition, current_user).search_users do |result, progress_rate|
         results.each { result.calc(_1) }
         p "ユーザー取得中"
 
@@ -50,10 +52,10 @@ class SearchTwitterUserJob < ApplicationJob
 
   private
 
-  def searcher(twitter_search_condition, access_token)
+  def searcher(twitter_search_condition, user)
     # TODO: 一時的な対応。後ほどログインさせて、ログインしているユーザーの情報から持ってくる
     # access_token = Rails.application.credentials.twitter[:bearer_token]
 
-    TwitterSearcher.new(twitter_search_condition, access_token)
+    TwitterSearcher.new(twitter_search_condition, user)
   end
 end
