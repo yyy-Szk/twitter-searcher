@@ -10,7 +10,7 @@ class Oauth::TwitterController < ApplicationController
     }
 
     conn = Faraday.new(url: "https://api.twitter.com", params: parameters) do |builder|
-      builder.request :authorization, :basic, twitter_credentials.dig(:oauth, :client_id), witter_credentials.dig(:oauth, :client_secret)
+      builder.request :authorization, :basic, twitter_credentials.dig(:oauth, :client_id), twitter_credentials.dig(:oauth, :client_secret)
       builder.adapter Faraday.default_adapter
     end
     res = JSON.parse conn.post("/2/oauth2/token").body

@@ -2,6 +2,7 @@ class User < ApplicationRecord
   has_many :twitter_search_process, dependent: :destroy
 
   has_secure_password
+  
 
   def self.find_or_create_by_oauth(omniauth_params)
     # user = find_or_initialize_by(twitter_user_id: omniauth_params[:uid]) do |user|
@@ -18,5 +19,13 @@ class User < ApplicationRecord
 
   def refresh_access_token_if_needed!
     # TwitterApiClient.access_token_expired?(fetched_access_token_at)
+  end
+
+  def has_active_process?
+    active_process.present?
+  end
+
+  def active_process
+    twitter_search_process.where("progress_rate != ?", 100)
   end
 end

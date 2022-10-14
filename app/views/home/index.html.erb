@@ -3,82 +3,92 @@
   <h1 style="margin: 30px 0 0 30px;"><a href="/">検索ページ</a></h1>
 
   <% if logged_in? %>
+    <p style="margin-left: 30px"><%= link_to "ログアウト", "/logout", method: :delete %></p>
+
     <% if current_user.twitter_refresh_token.present? %>
     <div style="margin-top: 50px; margin-left: 90px">
       <h2>ユーザーを検索する</h2>
 
+      <% unless current_user.has_active_process? %>
+        <%= form_with(url: search_customers_path, local: true, class: "search-form") do |f| %>
+          <div class="search-form-content">
 
-      <%= form_with(url: search_customers_path, local: true, class: "search-form") do |f| %>
-        <div class="search-form-content">
+            <% flash.each do |message_type, message| %>
+              <p class=<%= "flash-#{message_type}" %>><%= message %></p>
+            <% end %>
 
-          <% flash.each do |message_type, message| %>
-            <p class=<%= "flash-#{message_type}" %>><%= message %></p>
-          <% end %>
+            <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+            を
 
-          <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-          を
+            <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
-          <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+            <br>
 
-          <br>
+            <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+            を
+            <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
-          <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-          を
-          <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+            <br>
 
-          <br>
+            <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+            を
+            <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
-          <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-          を
-          <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+            <br>
 
-          <br>
+            <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+            を
+            <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
-          <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-          を
-          <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+            <br>
 
-          <br>
+            <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+            を
+            <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
 
-          <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-          を
-          <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+            <p>かつ</p>
 
-          <p>かつ</p>
+            <%# <p>（最終的には、ボタンを押したら絞り込み条件を一つ追加できるようにしたい。最大で３個くらいつけられるようにする。）</p>
+            <p>（ログイン機能を実装したら、ユーザーを検索している間は検索ができないようにする。）</p> %>
 
-          <%# <p>（最終的には、ボタンを押したら絞り込み条件を一つ追加できるようにしたい。最大で３個くらいつけられるようにする。）</p>
-          <p>（ログイン機能を実装したら、ユーザーを検索している間は検索ができないようにする。）</p> %>
+            <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+            を
+            <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
-          <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-          を
-          <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+            <br>
 
-          <br>
+            <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+            を
+            <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
-          <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-          を
-          <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+            <br>
 
-          <br>
+            <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+            を
+            <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
-          <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-          を
-          <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+            <br>
 
-          <br>
+            <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+            を
+            <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
-          <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-          を
-          <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+            <br>
 
-          <br>
+            <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+            を
+            <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
-          <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-          を
-          <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
+            <%= f.submit "検索" %>
+          </div>
+        <% end %>
+      <% else %>
+        <p>検索処理が進行中です</p>
 
-          <%= f.submit "検索" %>
-        </div>
+        <% current_user.active_process.each do |process| %>
+          
+          <p><%= link_to "詳細ページ", "/results/#{process.id}" %></p>
+        <% end %>
       <% end %>
     </div>
     <% else %>

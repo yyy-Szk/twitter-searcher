@@ -1,8 +1,10 @@
 Rails.application.routes.draw do
   get "/login", to: 'sessions#new'
+  delete "/logout", to: 'sessions#destroy'
   post 'sessions/create'
   delete 'sessions/destroy'
 
+  post '/process_stop/:id', to: 'home#process_stop'
   root 'home#index'
   # 一時的なもの
   post "search_customers", to: 'home#search_customers'

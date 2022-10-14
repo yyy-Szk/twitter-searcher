@@ -5,6 +5,7 @@ class SessionsController < ApplicationController
   def create
     user = User.find_by(uid: params[:uid])
     if user && user.authenticate(params[:password])
+      user.update(twitter_access_token: nil, twitter_refresh_token: nil)
       login(user)
       flash[:notice] = 'ログインしました'
 

@@ -16,7 +16,8 @@ class SearchTwitterUserJob < ApplicationJob
     results = narrow_down_conditions.map do |condition|
       searcher(condition, current_user).search_users do |data, progress_rate|
         p "絞り込み条件取得中"
-        
+        return if twitter_search_process.reload.status_will_finish?
+
         # 進捗
         # twitter_search_process.update progrss_rate: progrss_rate
       end
@@ -27,13 +28,18 @@ class SearchTwitterUserJob < ApplicationJob
 
     # 本番ユーザー取得
     search_conditions.inject([]) do |feched_users, search_condition|
+      p "ユーザー取得1"
       search_result = searcher(search_condition, current_user).search_users do |result, progress_rate|
+        p "ユーザー取得2"
         results.each { result.calc(_1) }
         p "ユーザー取得中"
 
         data = result.data.select { feched_users.pluck("username").exclude?(_1["username"]) }
+        p data
         if data.present?
           TwitterSearchResult.create(twitter_search_process: twitter_search_process, data: data)
+          return if twitter_search_process.reload.status_will_finish?
+
           # payload = twitter_search_process.payload | result.data
           # twitter_search_process.update payload: twitter_search_process.payload | payload #, progress_rate
         end
@@ -47,7 +53,7 @@ class SearchTwitterUserJob < ApplicationJob
     error_class = "#{e.class} / #{e.backtrace}"
     twitter_search_process.update error_class: error_class, error_message: e.message
   ensure
-    twitter_search_process.update progress_rate: 100
+    twitter_search_process.update progress_rate: 100, status: :finished
   end
 
   private
