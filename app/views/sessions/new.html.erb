@@ -1,0 +1,28 @@
+
+<div class="home-wrapper">
+  <h1 style="margin: 30px 0 0 30px;"><a href="/">ログインページ</a></h1>
+
+  <div style="margin-top: 50px; margin-left: 90px">
+
+    <%= form_with(url: sessions_create_path, local: true, class: "search-form") do |f| %>
+      <div class="search-form-content">
+
+        <% flash.each do |message_type, message| %>
+          <p class=<%= "flash-#{message_type}" %>><%= message %></p>
+        <% end %>
+
+        <div>
+          <%= f.label :uid, "ユーザーID" %>
+          <%= f.text_field :uid, { placeholder: "IDを入力", class: "content-field" } %>
+        </div>
+
+        <div>
+          <%= f.label :password, "パスワード" %>
+          <%= f.password_field :password, { placeholder: "パスワードを入力", class: "content-field"  } %>
+        </div>
+
+        <%= f.submit "送信" %>
+      </div>
+    <% end %>
+  </div>
+</div>
