@@ -11,12 +11,16 @@ class SearchTwitterUserJob < ApplicationJob
     current_user = twitter_search_process.user
     # access_token = current_user.twitter_access_token
     # refresh_token = current_user.twitter_refresh_token
+    message = ""
 
     p "絞り込み条件取得開始"
     results = narrow_down_conditions.map do |condition|
       searcher(condition, current_user).search_users do |data, progress_rate|
         p "絞り込み条件取得中"
-        return if twitter_search_process.reload.status_will_finish?
+        if twitter_search_process.reload.status_will_finish?
+          message = "処理がキャンセルされました"
+          return
+        end
 
         # 進捗
         # twitter_search_process.update progrss_rate: progrss_rate
@@ -28,9 +32,7 @@ class SearchTwitterUserJob < ApplicationJob
 
     # 本番ユーザー取得
     search_conditions.inject([]) do |feched_users, search_condition|
-      p "ユーザー取得1"
       search_result = searcher(search_condition, current_user).search_users do |result, progress_rate|
-        p "ユーザー取得2"
         results.each { result.calc(_1) }
         p "ユーザー取得中"
 
@@ -38,8 +40,10 @@ class SearchTwitterUserJob < ApplicationJob
         p data
         if data.present?
           TwitterSearchResult.create(twitter_search_process: twitter_search_process, data: data)
-          return if twitter_search_process.reload.status_will_finish?
-
+          if twitter_search_process.reload.status_will_finish?
+            message = "処理がキャンセルされました"
+            return
+          end
           # payload = twitter_search_process.payload | result.data
           # twitter_search_process.update payload: twitter_search_process.payload | payload #, progress_rate
         end
@@ -53,7 +57,7 @@ class SearchTwitterUserJob < ApplicationJob
     error_class = "#{e.class} / #{e.backtrace}"
     twitter_search_process.update error_class: error_class, error_message: e.message
   ensure
-    twitter_search_process.update progress_rate: 100, status: :finished
+    twitter_search_process.update progress_rate: 100, status: :finished, error_message: message
   end
 
   private
