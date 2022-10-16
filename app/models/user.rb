@@ -1,7 +1,9 @@
 class User < ApplicationRecord
   has_many :twitter_search_process, dependent: :destroy
+  validates :uid, uniqueness: true
 
   has_secure_password
+
   
 
   def self.find_or_create_by_oauth(omniauth_params)

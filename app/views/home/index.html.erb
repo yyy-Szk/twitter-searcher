@@ -92,7 +92,10 @@
       <% end %>
     </div>
     <% else %>
-      <% auth_url = "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=LXVTR1NCV01ORXlDeF9HWnZUUU06MTpjaQ&redirect_uri=http%3A%2F%2F127.0.0.1%3A3000%2Fauth%2Ftwitter%2Fcallback&scope=tweet.read%20users.read%20like.read%20follows.read%20follows.write%20offline.access&state=abc&code_challenge=abc&code_challenge_method=plain" %>
+      <% client_id = Rails.application.credentials.twitter.dig(:oauth, :client_id) %>
+      <% redirect_uri = CGI.escape(Rails.application.credentials.twitter.dig(:oauth, :callback_url)) %>
+      <% scopes = "tweet.read%20users.read%20like.read%20follows.read%20follows.write%20offline.access" %>
+      <% auth_url = "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=#{client_id}&redirect_uri=#{redirect_uri}&scope=#{scopes}&state=abc&code_challenge=abc&code_challenge_method=plain" %>
       <p>検索するには、<%= link_to 'Twitter認証', auth_url, method: :get %>をしてください</p>
     <% end %>
   <% else %>

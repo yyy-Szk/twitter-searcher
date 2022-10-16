@@ -2,10 +2,10 @@ class Oauth::TwitterController < ApplicationController
   def new
     twitter_credentials = Rails.application.credentials.twitter
     parameters = {
-      client_id: "LXVTR1NCV01ORXlDeF9HWnZUUU06MTpjaQ",
+      client_id: "#{twitter_credentials.dig(:oauth, :client_id)}",
       grant_type: "authorization_code",
       code: params["code"],
-      redirect_uri: "http://127.0.0.1:3000/auth/twitter/callback",
+      redirect_uri: "#{twitter_credentials.dig(:oauth, :callback_url)}",
       code_verifier: "abc"
     }
 
