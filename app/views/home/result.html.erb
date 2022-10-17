@@ -40,7 +40,16 @@
     <div style="margin: 50px 0;">
       <p class="result-count">進行率: <%= @process.progress_rate == 100 ? "100%" : "現在取得中..." %> / ヒット数: <%= @results.sum { _1.data.count } || 0 %></p>
       <% if @process.progress_rate == 100 %>
-        <p class="result-count">結果: <%= @process.error_message.present? ? "取得に失敗しました" : "取得に成功しました" %> / エラーメッセージ: <%= @process.error_message || "なし" %></p>
+        <p class="result-count">結果: <%= @process.error_class.present? ? "取得に失敗しました" : "取得に成功しました" %> / エラーメッセージ: <%= @process.error_message || "なし" %></p>
+
+        <% if @process.error_class == "TwitterApiClient::UnAuthorizedError" %>
+          <% client_id = Rails.application.credentials.twitter.dig(:oauth, :client_id) %>
+          <% redirect_uri = CGI.escape(Rails.application.credentials.twitter.dig(:oauth, :callback_url)) %>
+          <% scopes = "tweet.read%20users.read%20like.read%20follows.read%20follows.write%20offline.access" %>
+          <% auth_url = "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=#{client_id}&redirect_uri=#{redirect_uri}&scope=#{scopes}&state=abc&code_challenge=abc&code_challenge_method=plain" %>
+          <p><%= link_to '再度認証する', auth_url, method: :get %></p>
+        <% end %>
+
       <% elsif @process.status_will_finish? %>
         <p class="result-count">中断処理を実行中です...</p>
       <% else %>

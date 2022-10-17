@@ -13,4 +13,7 @@ class TwitterApiClient
 
   class ResponseError < Error
   end
+
+  class UnAuthorizedError < Error
+  end
 end

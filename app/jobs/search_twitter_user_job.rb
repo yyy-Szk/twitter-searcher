@@ -54,8 +54,8 @@ class SearchTwitterUserJob < ApplicationJob
     p "ユーザー取得終了"
 
   rescue => e
-    error_class = "#{e.class} / #{e.backtrace}"
-    twitter_search_process.update error_class: error_class, error_message: e.message
+    message = e.message
+    twitter_search_process.update error_class: e.class
   ensure
     twitter_search_process.update progress_rate: 100, status: :finished, error_message: message
   end

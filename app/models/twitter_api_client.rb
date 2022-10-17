@@ -142,10 +142,13 @@ class TwitterApiClient
 
   def parse(response)
     json = JSON.parse(response.body)
-
+p response.status
     case response.status
     when 200
       json
+    when 401
+      message = "認証の有効期限が切れているので、再度認証してください"
+      raise TwitterApiClient::UnAuthorizedError.new(message)
     when 429
       reset_at = Time.at(response.headers["x-rate-limit-reset"].to_i)
       message = json.map { "#{_1}: #{_2}" }.join(",\s")
