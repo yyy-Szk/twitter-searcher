@@ -86,7 +86,7 @@ class TwitterSearcher
       res = client.fetch_liking_users_by(tweet_id: tweet["id"], next_token: next_token)
 
       if res["data"].present?
-        liking_users |= res["data"] 
+        liking_users |= res["data"].select { result.data.pluck("username").exclude?(_1["username"]) }
         result.data |= liking_users
       end
 
