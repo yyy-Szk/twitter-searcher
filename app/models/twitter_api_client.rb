@@ -6,7 +6,7 @@ require_relative "twitter_api_client/error"
 
 class TwitterApiClient
   API_ENDPOINT = "https://api.twitter.com"
-  USERS_FIELDS = "public_metrics,id,username,description,name"
+  USERS_FIELDS = "public_metrics,id,username,description,name,protected"
   TWEET_FIELDS = "public_metrics"
   # 設定可能な項目
   # created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld
@@ -49,6 +49,16 @@ class TwitterApiClient
     self
   end
 
+  def fetch_users_me
+    path = "/2/users/me"
+    params = {
+      "user.fields": USERS_FIELDS
+    }
+    response = connection_get(path, params)
+
+    parse(response)
+  end
+
   def fetch_followed_users_by(user_id:, next_token: nil)
     path = "/2/users/#{user_id}/followers"
     params = {
@@ -63,15 +73,16 @@ class TwitterApiClient
     parse(response)
   end
 
-  # TODO: とりあえず、現状は使わない
-  def fetch_following_users_by(user_id:)
+  def fetch_following_users_by(user_id:, next_token: nil)
     path = "/2/users/#{user_id}/following"
     params = {
       max_results: 1000,
-      "user.fields": USERS_FIELDS
-    }
+      "user.fields": USERS_FIELDS,
+      pagination_token: next_token
+  }.compact
     response = connection_get(path, params)
-
+    # 15リクエスト/15min
+    sleep(60)
     parse(response)
   end
 

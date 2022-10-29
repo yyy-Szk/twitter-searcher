@@ -20,4 +20,5 @@ ja:
         not_liked_in_the_last_three_month: 直近3ヶ月にいいねしていないユーザー
         following: フォローしているユーザー
         not_following: フォローしていないユーザー
+        not_following_current_user: すでにフォロー済みのユーザーを非表示
       twitter_search_result: aaa

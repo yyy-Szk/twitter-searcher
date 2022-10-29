@@ -33,6 +33,14 @@ class HomeController < ApplicationController
       )
     end
 
+    if  params["remove_following_user"] == "true"
+      process.twitter_search_conditions.new(
+        condition_type: :narrowing,
+        content: "自分",
+        search_type: :not_following_current_user
+      )
+    end
+
     if process.save
       SearchTwitterUserJob.perform_later(process)
 

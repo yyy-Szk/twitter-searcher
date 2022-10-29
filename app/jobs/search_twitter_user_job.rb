@@ -33,19 +33,22 @@ class SearchTwitterUserJob < ApplicationJob
     # 本番ユーザー取得
     search_conditions.inject([]) do |feched_users, search_condition|
       search_result = searcher(search_condition, current_user).search_users do |result, progress_rate|
-        results.each { result.calc(_1) }
-        p "ユーザー取得中"
+        if twitter_search_process.reload.status_will_finish?
+          message = "処理がキャンセルされました"
+          return
+        end
 
-        data = result.data.select { feched_users.pluck("username").exclude?(_1["username"]) }
-        p data
-        if data.present?
-          TwitterSearchResult.create(twitter_search_process: twitter_search_process, data: data)
-          if twitter_search_process.reload.status_will_finish?
-            message = "処理がキャンセルされました"
-            return
+        if result.data.present?
+          results.each { result.calc(_1) }
+          p "ユーザー取得中"
+
+          data = result.data.select { feched_users.pluck("username").exclude?(_1["username"]) }
+          data = data.select { _1["protected"] == false }
+          if data.present?
+            TwitterSearchResult.create(twitter_search_process: twitter_search_process, data: data)
+            # payload = twitter_search_process.payload | result.data
+            # twitter_search_process.update payload: twitter_search_process.payload | payload #, progress_rate
           end
-          # payload = twitter_search_process.payload | result.data
-          # twitter_search_process.update payload: twitter_search_process.payload | payload #, progress_rate
         end
       end
 

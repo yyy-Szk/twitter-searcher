@@ -7,6 +7,7 @@
 
     <p>取得したユーザーの情報が、随時掲載されます。</p>
     <p>一定時間経過後に、再度画面を更新してください。</p>
+    <p style="font-size: 10px">※ ツイートを非表示にしているアカウント（鍵アカウント）は、検索結果に含まれません。</p>
 
     <div>
       <h3>メイン条件</h3>
@@ -38,7 +39,7 @@
     </div>
 
     <div style="margin: 50px 0;">
-      <p class="result-count">進行率: <%= @process.progress_rate == 100 ? "100%" : "現在取得中..." %> / ヒット数: <%= @results.sum { _1.data.count } || 0 %></p>
+      <p class="result-count">進行率: <%= @process.progress_rate == 100 ? "100%" : "現在取得中..." %> / 表示数: <%= @results.sum { _1.data.count } || 0 %></p>
       <% if @process.progress_rate == 100 %>
         <p class="result-count">結果: <%= @process.error_class.present? ? "取得に失敗しました" : "取得に成功しました" %> / エラーメッセージ: <%= @process.error_message || "なし" %></p>
 
@@ -53,7 +54,7 @@
       <% elsif @process.status_will_finish? %>
         <p class="result-count">中断処理を実行中です...</p>
       <% else %>
-       <%= link_to "処理を中断する", "/process_stop/#{@process.id}", method: :post %>
+        <%= link_to "処理を中断する", "/process_stop/#{@process.id}", method: :post %>
       <% end %>
     </div>
 

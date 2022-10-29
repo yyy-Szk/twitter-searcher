@@ -54,12 +54,66 @@ class TwitterSearcher
       search_liking_users(3.months, &block)
     when "following", "not_following"
       search_followed_users(&block)
+    when "not_following_current_user"
+      search_current_user_following(&block)
     else
       []
     end
   end
 
   private
+
+  def search_current_user_following
+    current_user_data = client.fetch_users_me["data"]
+    target_id = current_user_data["id"]
+    target_folling_count = current_user_data.dig("public_metrics", "following_count")
+
+    next_token = nil
+    following_users = []
+    result = Result.new(@twitter_search_condition)
+    loop do
+      update_client_access_token_if_needed!
+
+      res = client.fetch_following_users_by(user_id: target_id, next_token: next_token)
+      following_users = res["data"]
+      result.data += res["data"]
+
+      next_token = res.dig("meta", "next_token")
+      progress_rate = 0# next_token ? (followed_users.count/target_follower_count.to_f) * 100 : 100
+
+      yield(Result.new(@twitter_search_condition, following_users), progress_rate) if block_given?
+
+      break unless next_token
+    end
+
+    result
+  end
+
+  def search_following_users
+    target_user = client.fetch_user_by(@twitter_search_condition.content)["data"]
+    target_id = target_user["id"]
+    target_follower_count = target_user.dig("public_metrics", "followers_count")
+
+    next_token = nil
+    followed_users = []
+    result = Result.new(@twitter_search_condition)
+    loop do
+      update_client_access_token_if_needed!
+
+      res = client.fetch_followed_users_by(user_id: target_id, next_token: next_token)
+      followed_users = res["data"]
+      result.data += res["data"]
+
+      next_token = res.dig("meta", "next_token")
+      progress_rate = 0# next_token ? (followed_users.count/target_follower_count.to_f) * 100 : 100
+
+      yield(Result.new(@twitter_search_condition, followed_users), progress_rate) if block_given?
+
+      break unless next_token
+    end
+
+    result
+  end
 
   def search_liking_users(limit)
     # @twitter_search_condition#content には、ユーザーのプロフィールurlが入っている想定
@@ -98,7 +152,7 @@ class TwitterSearcher
       Rails.logger.info "#{i}/#{tweets.count}件目の取得が終了"
 
       progress_rate = 0#(i/tweets.size.to_f) * 100
-      yield(Result.new(@twitter_search_condition, liking_users), progress_rate) if block_given? && liking_users.present?
+      yield(Result.new(@twitter_search_condition, liking_users), progress_rate) if block_given?
       liking_users = []
     end
 

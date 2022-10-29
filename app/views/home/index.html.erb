@@ -79,6 +79,11 @@
             を
             <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
 
+            <div>
+              <%= f.label :remove_following_user, "フォロー済みのユーザーを表示しない" %>
+              <%= f.check_box :remove_following_user, { checked: true }, true, false %>
+            </div>
+
             <%= f.submit "検索" %>
           </div>
         <% end %>

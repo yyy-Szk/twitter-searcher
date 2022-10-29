@@ -11,6 +11,7 @@ class TwitterSearchCondition < ApplicationRecord
     not_liked_in_the_last_three_month: 5,
     following: 6,
     not_following: 7,
+    not_following_current_user: 8, # 主に、自分がフォローしているユーザーを排除するのに使用する
   }, _prefix: true
 
   class << self
@@ -19,7 +20,7 @@ class TwitterSearchCondition < ApplicationRecord
     end
 
     def narrowing_search_types
-      TwitterSearchCondition.search_types.dup
+      TwitterSearchCondition.search_types.dup.delete_if { |k, _| k == "not_following_current_user" }
     end
   end
 
