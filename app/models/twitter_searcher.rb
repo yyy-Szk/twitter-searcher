@@ -124,7 +124,7 @@ class TwitterSearcher
       update_client_access_token_if_needed!
 
       res = client.fetch_tweets_by(user_id: target_user_id, limit: limit, next_token: next_token)
-      tweets.concat(res["data"])
+      tweets.concat(res["data"]) if res["data"].present?
 
       next_token = res.dig("meta", "next_token")
       break if next_token.blank?
