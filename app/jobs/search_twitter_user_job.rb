@@ -57,6 +57,9 @@ class SearchTwitterUserJob < ApplicationJob
     p "ユーザー取得終了"
 
   rescue => e
+    p "=========="
+    p Rails.logger.info e.backtrace
+    p "=========="
     message = e.message
     twitter_search_process.update error_class: e.class
   ensure

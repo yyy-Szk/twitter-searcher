@@ -153,7 +153,7 @@ class TwitterApiClient
 
   def parse(response)
     json = JSON.parse(response.body)
-p response.status
+
     case response.status
     when 200
       json
