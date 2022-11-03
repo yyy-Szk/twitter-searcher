@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  get 'twitter_search_processes/new'
+  get 'twitter_search_processes/creaate'
+  get 'twitter_search_processes/update'
+  get 'twitter_search_processes/show'
   get "/login", to: 'sessions#new'
   delete "/logout", to: 'sessions#destroy'
   post 'sessions/create'
