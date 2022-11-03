@@ -11,7 +11,4 @@ Rails.application.routes.draw do
   get "results/:id", to: 'home#result'
   # TODO: GETでユーザー情報保存するのは良くないと思うのでどうか。
   get '/auth/twitter/callback', to: 'oauth/twitter#new'
-    # namespace module: "sessions" do
-    # post '/twitter/:provider/callback', to: 'sessions#create'
-  # end
 end
