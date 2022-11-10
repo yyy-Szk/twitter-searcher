@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :twitter_search_processes, only: %i[new show create update]
+
   get "/login", to: 'sessions#new'
   delete "/logout", to: 'sessions#destroy'
   post 'sessions/create'
@@ -8,10 +10,6 @@ Rails.application.routes.draw do
   root 'home#index'
   # 一時的なもの
   post "search_customers", to: 'home#search_customers'
-  get "results/:id", to: 'home#result'
   # TODO: GETでユーザー情報保存するのは良くないと思うのでどうか。
   get '/auth/twitter/callback', to: 'oauth/twitter#new'
-    # namespace module: "sessions" do
-    # post '/twitter/:provider/callback', to: 'sessions#create'
-  # end
 end

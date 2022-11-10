@@ -1,6 +1,6 @@
 
 <div class="home-wrapper">
-  <h1 style="margin: 30px 0 0 30px;"><a href="/">検索ページ</a></h1>
+  <h1 style="margin: 30px 0 0 30px;"><a href="/twitter_search_processes/new">検索ページ</a></h1>
 
   <div style="margin-top: 50px; margin-left: 90px">
     <h2>検索結果</h2>
@@ -64,17 +64,14 @@
       <% end %>
     </div>
 
-       <%= paginate @results %>
-
-
+    <%= paginate @results %>
 
     <div class="search-results">
 
-
       <% @results.each do |twitter_search_result| %>
-     
+
       <% twitter_search_result.data.each do |result| %>
-      
+
         <div class="user-info">
           <h3>
             <a href=<%= "https://twitter.com/#{result["username"]}" %> target="__blank">
