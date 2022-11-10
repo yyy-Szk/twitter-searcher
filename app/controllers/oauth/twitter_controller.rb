@@ -21,7 +21,7 @@ class Oauth::TwitterController < ApplicationController
       fetched_access_token_at: Time.now
     )
 
-    redirect_to root_path
+    redirect_to new_twitter_search_process_url
   end
 
   def create
