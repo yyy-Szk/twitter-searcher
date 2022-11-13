@@ -5,11 +5,9 @@ class SessionsController < ApplicationController
   def create
     user = User.find_by(uid: params[:uid])
     if user && user.authenticate(params[:password])
-      # user.update(twitter_access_token: nil, twitter_refresh_token: nil)
       login(user)
       flash[:notice] = 'ログインしました'
-
-      redirect_to new_twitter_search_process_url
+      redirect_to controller: "twitter_search_processes", action: "new", need_auth: "true"
     else
       flash[:notice] = 'ログインに失敗しました。'
 

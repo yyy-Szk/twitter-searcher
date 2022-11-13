@@ -2,6 +2,7 @@ class TwitterSearchProcessesController < ApplicationController
   before_action :validate, only: :create
 
   def new
+    @is_authenticated = !(params[:need_auth] == "true")
   end
 
   def show

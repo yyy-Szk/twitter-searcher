@@ -4,7 +4,7 @@
 
     <p style="margin-left: 30px"><%= link_to "ログアウト", "/logout", method: :delete %></p>
 
-    <% if current_user.twitter_refresh_token.present? %>
+    <% if @is_authenticated %>
     <div style="margin-top: 50px; margin-left: 90px">
       <h2>ユーザーを検索する</h2>
 
