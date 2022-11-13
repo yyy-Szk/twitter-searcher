@@ -60,37 +60,32 @@
       <% elsif @process.status_will_finish? %>
         <p class="result-count">中断処理を実行中です...</p>
       <% else %>
-        <%= link_to "処理を中断する", "/process_stop/#{@process.id}", method: :post %>
+        <%= link_to "処理を中断する", "/twitter_search_processes/#{@process.id}", method: :put %>
       <% end %>
     </div>
 
     <%= paginate @results %>
 
     <div class="search-results">
-
       <% @results.each do |twitter_search_result| %>
+        <% twitter_search_result.data.each do |result| %>
+          <div class="user-info">
+            <h3>
+              <a href=<%= "https://twitter.com/#{result["username"]}" %> target="__blank">
+                <%= result["name"] %>
+                <span class="username"><%= "@#{result["username"]}  " %></span>
+                </a>
+            </h3>
 
-      <% twitter_search_result.data.each do |result| %>
+            <p class="description"><%= result["description"] %></p>
 
-        <div class="user-info">
-          <h3>
-            <a href=<%= "https://twitter.com/#{result["username"]}" %> target="__blank">
-              <%= result["name"] %>
-              <span class="username"><%= "@#{result["username"]}  " %></span>
-              </a>
-          </h3>
-
-          <p class="description"><%= result["description"] %></p>
-
-          <p class="public-metrics">
-            フォロー数: <%= result["public_metrics"]["following_count"] %> /
-            フォロワー数: <%= result["public_metrics"]["followers_count"] %> /
-            ツイート数: <%= result["public_metrics"]["tweet_count"] %> /
-            リスト数: <%= result["public_metrics"]["listed_count"] %>
-          </p>
-        </div>
-
-      <% end %>
+            <p class="public-metrics">
+              フォロー数: <%= result["public_metrics"]["following_count"] %> /
+              フォロワー数: <%= result["public_metrics"]["followers_count"] %> /
+              ツイート数: <%= result["public_metrics"]["tweet_count"] %>
+            </p>
+          </div>
+        <% end %>
       <% end %>
     </div>
   </div>

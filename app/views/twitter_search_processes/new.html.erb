@@ -90,8 +90,7 @@
         <p>検索処理が進行中です</p>
 
         <% current_user.active_process.each do |process| %>
-
-          <p><%= link_to "詳細ページ", "/results/#{process.id}" %></p>
+          <p><%= link_to "詳細ページ", "/twitter_search_processes/#{process.id}" %></p>
         <% end %>
       <% end %>
     </div>

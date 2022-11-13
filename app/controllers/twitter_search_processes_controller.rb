@@ -59,7 +59,7 @@ class TwitterSearchProcessesController < ApplicationController
     process = TwitterSearchProcess.find(params[:id])
     process.update(status: :will_finish)
 
-    redirect_to "/results/#{process.id}"
+    redirect_to twitter_search_process_url(process.id)
   end
 
   private
