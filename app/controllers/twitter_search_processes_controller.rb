@@ -1,5 +1,6 @@
 class TwitterSearchProcessesController < ApplicationController
   before_action :validate, only: :create
+  before_action :require_login
 
   def new
     @is_authenticated = !(params[:need_auth] == "true")
@@ -85,5 +86,9 @@ class TwitterSearchProcessesController < ApplicationController
       flash[:alert] = "検索対象のユーザーは、最低一つは入力してください。"
       render action: "index" and return
     end
+  end
+
+  def require_login
+    redirect_to login_url unless logged_in?
   end
 end
