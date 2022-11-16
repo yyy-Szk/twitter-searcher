@@ -75,4 +75,5 @@ Rails.application.configure do
   # config.action_cable.disable_request_forgery_protection = true
   config.hosts << ".herokuapp.com"
   config.hosts << ".onrender.com"
+  config.hosts << "twitter-searcher.onrender.com"
 end
