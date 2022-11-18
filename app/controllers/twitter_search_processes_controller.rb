@@ -83,8 +83,9 @@ class TwitterSearchProcessesController < ApplicationController
       p "=========="
       p search_condition_params
       p "=========="
+
       flash[:alert] = "検索対象のユーザーは、最低一つは入力してください。"
-      render action: "index" and return
+      render action: :new and return
     end
   end
 
