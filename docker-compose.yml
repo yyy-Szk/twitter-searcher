@@ -11,12 +11,33 @@ services:
       POSTGRES_PASSWORD: password
       EDITOR: vi
       TZ: Asia/Tokyo
+      REDIS_URL: redis://redis:6379
     ports:
       - "3000:3000"
     depends_on:
       - db
+      - redis
     tty: true
     stdin_open: true
+  sidekiq:
+    build: .
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      EDITOR: vi
+      TZ: Asia/Tokyo
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ".:/var/myapp"
+    depends_on:
+      - db
+      - redis
+    command: "bundle exec sidekiq -C config/sidekiq.yml"
+  redis:
+    image: redis:6.2.7
+    volumes:
+      - "redis_volume:/data"
+    command: redis-server --appendonly yes
   db:
     image: postgres
     environment:
@@ -24,8 +45,9 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - postgres_volume:/var/lib/postgresql/data
-    restart: always 
+    restart: always
 
 volumes:
   postgres_volume:
+  redis_volume:
 
