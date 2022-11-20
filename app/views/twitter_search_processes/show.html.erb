@@ -16,7 +16,10 @@
           <li>
             <a href=<%= condition.content %> target="__blank"><%= condition.content %></a>
             を
-            <%= condition.human_attribute_enum("search_type") %>
+            <%= condition.human_attribute_enum("type") %>
+            <% if condition.type.include?("LikedTweetUser") %>
+              （直近<%= condition.num_of_days %>日のツイート）
+            <% end %>
           </li>
         <% end %>
       </ul>
@@ -30,7 +33,7 @@
               <% if condition.search_type_not_following_current_user? %>
                 <%= condition.content %>
                 が
-                <%= condition.human_attribute_enum("search_type") %>
+                <%= condition.human_attribute_enum("type") %>
               <% else %>
                 <a href=<%= condition.content %> target="__blank"><%= condition.content %></a>
                 を
