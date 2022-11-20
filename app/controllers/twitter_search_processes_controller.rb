@@ -8,48 +8,18 @@ class TwitterSearchProcessesController < ApplicationController
 
   def show
     @process = TwitterSearchProcess.find(params[:id])
+    # 一つの結果には、最大で500まで入れられるようにする。
     @results = TwitterSearchResult.where(twitter_search_process: @process).page(params[:page]).per(3)
     @main_conditions = @process.twitter_search_conditions.condition_type_main
     @narrowing_conditions = @process.twitter_search_conditions.condition_type_narrowing
   end
 
   def create
-    # redisのdockerレイヤ追加。
-    #  Tweet.new(tweet_id, liking_users_json)
-    # todo: user_id追加したい
-    search_conditions = search_condition_params.delete_if { _1["content"].empty? }
-    narrow_down_conditions = narrow_down_condition_params.delete_if { _1["content"].empty? }
-
-    process = TwitterSearchProcess.new(user: current_user, status: :progressing)
-    search_conditions.each do
-      process.twitter_search_conditions.new(
-        condition_type: :main,
-        content: _1["content"],
-        # TODO: to_iは一時的なものとして、もっといい対応方法がないか考える
-        search_type: _1["search_type"].to_i
-      )
-    end
-
-    narrow_down_conditions.each do
-      process.twitter_search_conditions.new(
-        condition_type: :narrowing,
-        content: _1["content"],
-        # TODO: to_iは一時的なものとして、もっといい対応方法がないか考える
-        search_type: _1["search_type"].to_i
-      )
-    end
-
-    if params["remove_following_user"] == "true"
-      process.twitter_search_conditions.new(
-        condition_type: :narrowing,
-        content: "自分",
-        search_type: :not_following_current_user
-      )
-    end
-
-    if process.save
+    # 文字列で統一
+    options = { "remove_following_user" => params["remove_following_user"] }
+    process = TwitterSearchProcess.create_with_conditions(current_user, search_condition_params, narrow_condition_params, options)
+    if process.persisted?
       SearchTwitterUserJob.perform_later(process)
-
       redirect_to action: "show", id: process.id
     else
       redirect_to action: "new"
@@ -66,27 +36,29 @@ class TwitterSearchProcessesController < ApplicationController
   private
 
   def search_condition_params
-    params[:conditions].map do
-      _1.permit(:content, :search_type)
+    params[:search_conditions].map do
+      _1.permit(:content, :search_type, :num_of_days)
     end
-    # params.require(:conditions).permit(:)
   end
 
-  def narrow_down_condition_params
-    params[:narrow_down_conditions].map do
-      _1.permit(:content, :search_type)
+  def narrow_condition_params
+    params[:narrow_conditions].map do
+      _1.permit(:content, :search_type, :num_of_days)
     end
   end
 
   def validate
     if search_condition_params.all? { _1["content"].empty? }
-      p "=========="
-      p search_condition_params
-      p "=========="
-
       flash[:alert] = "検索対象のユーザーは、最低一つは入力してください。"
+      @is_authenticated = "true"
       render action: :new and return
     end
+
+    # TODO バリデーション
+    # if search_condition_params.select { _1["search_type"].empty? }
+    #   flash[:alert] = "検索対象のユーザーは、最低一つは入力してください。"
+    #   render action: :new and return
+    # end
   end
 
   def require_login

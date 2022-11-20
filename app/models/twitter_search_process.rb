@@ -4,4 +4,110 @@ class TwitterSearchProcess < ApplicationRecord
   has_many :twitter_search_results, dependent: :destroy
 
   enum status: { progressing: 0, will_finish: 1, finished: 2 }, _prefix: true
+
+  class << self
+    def create_with_conditions(user, search_condition_params, narrow_condition_params, options = {})
+      search_condition_params = search_condition_params.delete_if { _1["content"].empty? }
+      narrow_condition_params = narrow_condition_params.delete_if { _1["content"].empty? }
+
+      process = self.new(user: user, status: :progressing)
+      search_condition_params.each do
+        process.twitter_search_conditions.new(
+          condition_type: :main,
+          content: _1["content"],
+          type: _1["search_type"],
+          num_of_days: _1["num_of_days"],
+          search_type: :following # 後で消す
+          # TODO: to_iは一時的なものとして、もっといい対応方法がないか考える
+          # search_type: _1["search_type"].to_i
+        )
+      end
+
+      narrow_condition_params.each do
+        process.twitter_search_conditions.new(
+          condition_type: :narrowing,
+          content: _1["content"],
+          type: _1["search_type"],
+          num_of_days: _1["num_of_days"],
+          search_type: :not_following # 後で消す
+        )
+      end
+
+      if options["remove_following_user"] == "true"
+        process.twitter_search_conditions.new(
+          condition_type: :narrowing,
+          content: "自分",
+          type: "NotFollowingCurrentUser",
+          search_type: :following # 後で消す
+        )
+      end
+      process.save
+
+      process
+    end
+  end
+
+  def execute!
+    message = ""
+
+    p "絞り込み条件取得開始"
+    # setup_narrow_conditions
+    results = narrow_conditions.map do |condition|
+      condition.search do |data, progress_rate|
+        p "絞り込み条件取得中"
+        if self.reload.status_will_finish?
+          message = "処理がキャンセルされました"
+          return
+        end
+
+        # 進捗
+        # self.update progrss_rate: progrss_rate
+      end
+    end
+
+    p "絞り込み条件取得終了"
+    p "ユーザー取得開始"
+
+    # 本番ユーザー取得
+    search_conditions.inject([]) do |feched_users, search_condition|
+      search_result = search_condition.search do |result, progress_rate|
+        if self.reload.status_will_finish?
+          message = "処理がキャンセルされました"
+          return
+        end
+
+        if result.data.present?
+          results.each { result.calc(_1) }
+          p "ユーザー取得中"
+
+          data = result.data.select { feched_users.pluck("username").exclude?(_1["username"]) }
+          data = data.select { _1["protected"] == false }
+          if data.present?
+            TwitterSearchResult.create(twitter_search_process: self, data: data)
+            # payload = twitter_search_process.payload | result.data
+            # twitter_search_process.update payload: twitter_search_process.payload | payload #, progress_rate
+          end
+        end
+      end
+
+      feched_users | search_result.data
+    end
+    p "ユーザー取得終了"
+  rescue => e
+    p "=========="
+    Rails.logger.info e.backtrace
+    p "=========="
+    message = e.message
+    self.update error_class: e.class
+  ensure
+    self.update progress_rate: 100, status: :finished, error_message: message
+  end
+
+  def search_conditions
+    twitter_search_conditions.condition_type_main
+  end
+
+  def narrow_conditions
+    twitter_search_conditions.condition_type_narrowing
+  end
 end
