@@ -1,3 +1,64 @@
+<script>
+  window.addEventListener("load", () => {
+    addEventListenerToTypeField();
+  });
+
+  function addEventListenerToTypeField() {
+    const selectTags = document.getElementsByClassName("type-field");
+    Array.prototype.forEach.call(selectTags, element => {
+      element.addEventListener("change", (event) => {
+        event.preventDefault();
+        // TODO: どっかで管理できるようにする
+        if(element.value === "LikedTweetUser" || element.value === "NotLikedTweetUser")
+          displayNumOfDaysInput(element);
+        else
+          deleteNumOfDaysInput(element);
+      })
+    })
+  }
+
+  function displayNumOfDaysInput(element) {
+    const parentNode = element.closest("div");
+    const { searchType, index } = element.dataset
+    const numOfDaysInput = findNumOfDaysInput(searchType, index)
+
+    if(numOfDaysInput === null)
+      parentNode.appendChild(createNumOfDaysInput(searchType, index))
+  }
+
+  function createNumOfDaysInput(searchType, index) {
+    const numOfDaysInput = document.createElement("input");
+    numOfDaysInput.setAttribute("type", "number");
+    numOfDaysInput.setAttribute("min", 1);
+    numOfDaysInput.setAttribute("max", 90);
+    numOfDaysInput.setAttribute("style", "width: 38px");
+    numOfDaysInput.setAttribute("name", `${searchType}[][num_of_days]`);
+    numOfDaysInput.setAttribute("value", "1");
+
+    const span = document.createElement("span");
+    span.setAttribute("data-search-type", searchType);
+    span.setAttribute("data-index", index);
+    span.appendChild(document.createTextNode("（直近"))
+    span.appendChild(numOfDaysInput)
+    span.appendChild(document.createTextNode("日のツイート）"))
+
+    return span;
+  }
+
+  function deleteNumOfDaysInput(element) {
+    const { searchType, index } = element.dataset
+    const numOfDaysInput = findNumOfDaysInput(searchType, index)
+
+    if(numOfDaysInput != null)
+      numOfDaysInput.remove();
+  }
+
+  function findNumOfDaysInput(searchType, index) {
+    const numOfDaysInput = document.querySelector(`span[data-search-type="${searchType}"][data-index="${index}"]`)
+
+    return numOfDaysInput
+  }
+</script>
 
 <div class="home-wrapper">
   <h1 style="margin: 30px 0 0 30px;"><a href="/twitter_search_processes/new">検索ページ</a></h1>
@@ -5,95 +66,51 @@
     <p style="margin-left: 30px"><%= link_to "ログアウト", "/logout", method: :delete %></p>
 
     <% if @is_authenticated %>
-    <div style="margin-top: 50px; margin-left: 90px">
-      <h2>ユーザーを検索する</h2>
+      <div style="margin-top: 50px; margin-left: 90px">
+        <h2>ユーザーを検索する</h2>
 
-      <% unless current_user.has_active_process? %>
-        <%= form_with(url: twitter_search_processes_path, local: true, class: "search-form") do |f| %>
-          <div class="search-form-content">
+        <% unless current_user.has_active_process? %>
+          <%= form_with(url: twitter_search_processes_path, local: true, class: "search-form") do |f| %>
+            <div class="search-form-content">
 
-            <% flash.each do |message_type, message| %>
-              <p class=<%= "flash-#{message_type}" %>><%= message %></p>
-            <% end %>
+              <% flash.each do |message_type, message| %>
+                <p class=<%= "flash-#{message_type}" %>><%= message %></p>
+              <% end %>
 
-            <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-            を
+              <% 1.upto(5) do |i| %>
+                <div class=<%= "search-condition-#{i}" %>>
+                  <%= f.text_field :seach_content, { name: "search_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+                  を
+                  <%= f.select :search_type, main_twitter_search_types, {}, { name: "search_conditions[][search_type]", class: "type-field", "data-search-type": "search_conditions", "data-index": i } %>
+                </div>
+              <% end %>
 
-            <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+              <p>かつ</p>
 
-            <br>
+              <% 1.upto(5) do |i| %>
+                <div class=<%= "narrow-condition-#{i}" %>>
+                  <%= f.text_field :seach_content, { name: "narrow_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
+                  を
+                  <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_conditions[][search_type]", "data-search-type": "narrow_conditions", "data-index": i, class: "type-field" } %>
+                </div>
+              <% end %>
 
-            <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-            を
-            <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
+              <div>
+                <%= f.label :remove_following_user, "フォロー済みのユーザーを表示しない" %>
+                <%= f.check_box :remove_following_user, { name: "remove_following_user", checked: false }, true, false %>
+              </div>
 
-            <br>
-
-            <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-            を
-            <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
-
-            <br>
-
-            <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-            を
-            <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
-
-            <br>
-
-            <%= f.text_field :seach_content, { name: "conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-            を
-            <%= f.select :search_type, main_twitter_search_types, {}, { name: "conditions[][search_type]", class: "search0-type-field" } %>
-
-            <p>かつ</p>
-
-            <%# <p>（最終的には、ボタンを押したら絞り込み条件を一つ追加できるようにしたい。最大で３個くらいつけられるようにする。）</p>
-            <p>（ログイン機能を実装したら、ユーザーを検索している間は検索ができないようにする。）</p> %>
-
-            <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-            を
-            <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
-
-            <br>
-
-            <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-            を
-            <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
-
-            <br>
-
-            <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-            を
-            <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
-
-            <br>
-
-            <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-            を
-            <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
-
-            <br>
-
-            <%= f.text_field :seach_content, { name: "narrow_down_conditions[][content]", placeholder: "検索したいユーザーのURLを入力", class: "content-field"  } %>
-            を
-            <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_down_conditions[][search_type]", class: "search0-type-field" } %>
-
-            <div>
-              <%= f.label :remove_following_user, "フォロー済みのユーザーを表示しない" %>
-              <%= f.check_box :remove_following_user, { checked: true }, true, false %>
+              <%= f.submit "検索" %>
             </div>
+          <% end %>
+        <% else %>
+          <p>検索処理が進行中です</p>
 
-            <%= f.submit "検索" %>
-          </div>
+          <% current_user.active_process.each do |process| %>
+            <p><%= link_to "詳細ページ", "/twitter_search_processes/#{process.id}" %></p>
+          <% end %>
         <% end %>
-      <% else %>
-        <p>検索処理が進行中です</p>
-
-        <% current_user.active_process.each do |process| %>
-          <p><%= link_to "詳細ページ", "/twitter_search_processes/#{process.id}" %></p>
-        <% end %>
-      <% end %>
-    </div>
+      </div>
     <% else %>
       <% client_id = Rails.application.credentials.twitter.dig(:oauth, :client_id) %>
       <% redirect_uri = CGI.escape(Rails.application.credentials.twitter.dig(:oauth, :callback_url)) %>

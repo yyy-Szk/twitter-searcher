@@ -6,19 +6,14 @@ ja:
     attributes:
       twitter_search_condition:
         condition_type: 条件の種類
-        search_type: 検索の種類
         content: 検索対象
+        type: タイプ
       twitter_search_condition/condition_type:
         main: メイン条件
         narrowing: 絞り込み条件
-      twitter_search_condition/search_type:
-        liked_in_the_last_month: 直近1ヶ月にいいねしたユーザー
-        liked_in_the_last_two_month: 直近2ヶ月にいいねしたユーザー
-        liked_in_the_last_three_month: 直近3ヶ月にいいねしたユーザー
-        not_liked_in_the_last_month: 直近1ヶ月にいいねしていないユーザー
-        not_liked_in_the_last_two_month: 直近2ヶ月にいいねしていないユーザー
-        not_liked_in_the_last_three_month: 直近3ヶ月にいいねしていないユーザー
-        following: フォローしているユーザー
-        not_following: フォローしていないユーザー
-        not_following_current_user: すでにフォロー済みのユーザーを非表示
-      twitter_search_result: aaa
+      twitter_search_condition/type:
+        FollowingUser: フォローしているユーザー
+        NotFollowingUser: フォローしていないユーザー
+        LikedTweetUser: いいねしているユーザー
+        NotLikedTweetUser: いいねしていないユーザー
+        NotFollowingCurrentUser: すでにフォロー済みのユーザーを非表示

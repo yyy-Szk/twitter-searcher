@@ -28,11 +28,13 @@ services:
       TZ: Asia/Tokyo
       REDIS_URL: redis://redis:6379
     volumes:
-      - ".:/var/myapp"
+      - .:/app
     depends_on:
       - db
       - redis
     command: "bundle exec sidekiq -C config/sidekiq.yml"
+    tty: true
+    stdin_open: true
   redis:
     image: redis:6.2.7
     volumes:
