@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe TwitterSearcher do
-  describe "#search_users" do
+  xdescribe "#search_users" do
     context "フォロワー検索の場合" do
       example "", vcr: { cassette_name: "success_fetching_followers" } do
         token = Rails.application.credentials.twitter[:bearer_token]

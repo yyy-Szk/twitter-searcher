@@ -17,9 +17,6 @@ class TwitterSearchProcess < ApplicationRecord
           content: _1["content"],
           type: _1["search_type"],
           num_of_days: _1["num_of_days"],
-          search_type: :following # 後で消す
-          # TODO: to_iは一時的なものとして、もっといい対応方法がないか考える
-          # search_type: _1["search_type"].to_i
         )
       end
 
@@ -29,7 +26,6 @@ class TwitterSearchProcess < ApplicationRecord
           content: _1["content"],
           type: _1["search_type"],
           num_of_days: _1["num_of_days"],
-          search_type: :not_following # 後で消す
         )
       end
 
@@ -38,7 +34,6 @@ class TwitterSearchProcess < ApplicationRecord
           condition_type: :narrowing,
           content: "自分",
           type: "NotFollowingCurrentUser",
-          search_type: :following # 後で消す
         )
       end
       process.save
