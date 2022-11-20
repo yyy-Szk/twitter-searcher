@@ -1,7 +1,16 @@
+# frozen_string_literal: true
+
 class TwitterSearchCondition < ApplicationRecord
   belongs_to :twitter_search_process
 
   enum condition_type: { main: 0, narrowing: 1 }, _prefix: true
+  # search_types = %i[
+  #   LikedTweetUser FollowingUser
+  # ].freeze
+
+  # narrowing_types = %i[
+  #   LikedTweetUser NotLikedTweetuser FollowingUser NotFollowingUser NotFollowingCurrentUser
+  # ]
   enum search_type: {
     liked_in_the_last_month: 0,
     liked_in_the_last_two_month: 1,
@@ -14,6 +23,9 @@ class TwitterSearchCondition < ApplicationRecord
     not_following_current_user: 8, # 主に、自分がフォローしているユーザーを排除するのに使用する
   }, _prefix: true
 
+  delegate :user, to: :twitter_search_process
+  delegate :search, to: :searcher
+
   class << self
     def main_search_types
       TwitterSearchCondition.search_types.dup.delete_if { |k,_| k.start_with?("not_") }
@@ -25,8 +37,10 @@ class TwitterSearchCondition < ApplicationRecord
   end
 
   def operator
-    if search_type.start_with?("not_") then "-"
-    else "&"
-    end 
+    raise NotImplementedError
+  end
+
+  def searcher
+    raise NotImplementedError
   end
 end
