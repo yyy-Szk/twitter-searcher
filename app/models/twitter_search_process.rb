@@ -78,7 +78,18 @@ class TwitterSearchProcess < ApplicationRecord
           data = result.data.select { feched_users.pluck("username").exclude?(_1["username"]) }
           data = data.select { _1["protected"] == false }
           if data.present?
-            TwitterSearchResult.create(twitter_search_process: self, data: data)
+            if last_result = self.twitter_search_results.order(created_at: :desc).limit(1).first
+              last_result_data = last_result.data
+              if last_result_data.size < 100
+                dadata = data.slice!(...(100 - last_result_data.size))
+                last_result.update(data: last_result_data + dadata)
+              end
+            end
+
+            # 一気にimportで入れたいけど、どうするか。
+            data.each_slice(100) do |sliced_data|
+              self.twitter_search_results.create(data: sliced_data)
+            end
             # payload = twitter_search_process.payload | result.data
             # twitter_search_process.update payload: twitter_search_process.payload | payload #, progress_rate
           end
