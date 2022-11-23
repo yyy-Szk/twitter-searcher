@@ -48,7 +48,7 @@ class TwitterSearchProcessesController < ApplicationController
   end
 
   def validate
-    if search_condition_params.all? { _1["content"].empty? }
+    if search_condition_params.all? { _1["content"].strip.empty? }
       flash[:alert] = "検索対象のユーザーは、最低一つは入力してください。"
       @is_authenticated = "true"
       render action: :new and return

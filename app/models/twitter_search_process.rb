@@ -7,14 +7,14 @@ class TwitterSearchProcess < ApplicationRecord
 
   class << self
     def create_with_conditions(user, search_condition_params, narrow_condition_params, options = {})
-      search_condition_params = search_condition_params.delete_if { _1["content"].empty? }
-      narrow_condition_params = narrow_condition_params.delete_if { _1["content"].empty? }
+      search_condition_params = search_condition_params.delete_if { _1["content"].strip.empty? }
+      narrow_condition_params = narrow_condition_params.delete_if { _1["content"].strip.empty? }
 
       process = self.new(user: user, status: :progressing)
       search_condition_params.each do
         process.twitter_search_conditions.new(
           condition_type: :main,
-          content: _1["content"],
+          content: _1["content"].strip,
           type: _1["search_type"],
           num_of_days: _1["num_of_days"],
         )
@@ -23,7 +23,7 @@ class TwitterSearchProcess < ApplicationRecord
       narrow_condition_params.each do
         process.twitter_search_conditions.new(
           condition_type: :narrowing,
-          content: _1["content"],
+          content: _1["content"].strip,
           type: _1["search_type"],
           num_of_days: _1["num_of_days"],
         )
