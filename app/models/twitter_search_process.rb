@@ -72,7 +72,7 @@ class TwitterSearchProcess < ApplicationRecord
         end
 
         if result.data.present?
-          results.each { result.calc(_1) }
+          results.each { result.narrowing(_1) }
           p "ユーザー取得中"
 
           data = result.data.select { feched_users.pluck("username").exclude?(_1["username"]) }
@@ -99,11 +99,23 @@ class TwitterSearchProcess < ApplicationRecord
       feched_users | search_result.data
     end
     p "ユーザー取得終了"
+  rescue TwitterApiClient::Error => e
+    p "=========="
+    Rails.logger.info e.backtrace
+    p "=========="
+    Rails.logger.info e.message
+    message = e.message
+    p "=========="
+
+    self.update error_class: e.class
   rescue => e
     p "=========="
     Rails.logger.info e.backtrace
     p "=========="
-    message = e.message
+    Rails.logger.info e.message
+    message = "予期せぬエラーが発生しました。入力値をお確かめの上、再実行してください。"
+    p "=========="
+
     self.update error_class: e.class
   ensure
     self.update progress_rate: 100, status: :finished, error_message: message

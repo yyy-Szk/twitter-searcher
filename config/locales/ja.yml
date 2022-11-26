@@ -17,3 +17,5 @@ ja:
         LikedTweetUser: いいねしているユーザー
         NotLikedTweetUser: いいねしていないユーザー
         NotFollowingCurrentUser: すでにフォロー済みのユーザーを非表示
+        IncludedWordInProfileUser: プロフィールに含むユーザー
+        NotIncludedWordInProfileUser:  プロフィールに含まないユーザー

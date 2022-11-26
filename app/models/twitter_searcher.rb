@@ -5,30 +5,13 @@ class TwitterSearcher
     attr_reader :twitter_search_condition
     attr_accessor :data
 
-    delegate :operator, to: :twitter_search_condition
-
     def initialize(twitter_search_condition, data = nil)
       @twitter_search_condition = twitter_search_condition
       @data = data || []
     end
 
-    def calc(other_result)
-      @data =
-        case other_result.operator
-        when "-"
-          reject(other_result.data.pluck("username"))
-        when "&"
-          select(other_result.data.pluck("username"))
-        end
-    end
-
-  
-    def reject(other_usernames)
-      data.reject { other_usernames.include?_1["username"] }
-    end
-
-    def select(other_usernames)
-      data.select { other_usernames.include?_1["username"] }
+    def narrowing(other_result)
+      @data = other_result.twitter_search_condition.narrowing(data, other_result.data)
     end
   end
 

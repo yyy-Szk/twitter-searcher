@@ -3,7 +3,9 @@ class NotLikedTweetUser < TwitterSearchCondition
     TwitterSearchers::LikedTweetUserSearcher.new(self)
   end
 
-  def operator
-    "-"
+  def narrowing(data, other_data)
+    other_usernames = other_data.pluck("username")
+
+    data.reject { other_usernames.include?_1["username"] }
   end
 end

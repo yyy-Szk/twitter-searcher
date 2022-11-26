@@ -13,7 +13,7 @@ class TwitterSearchCondition < ApplicationRecord
   # ]
 
   delegate :user, to: :twitter_search_process
-  delegate :search, to: :searcher
+  delegate :search, to: :searcher, allow_nil: true
 
   class << self
     def main_search_types
@@ -23,7 +23,7 @@ class TwitterSearchCondition < ApplicationRecord
     end
   end
 
-  def operator
+  def narrowing
     raise NotImplementedError
   end
 

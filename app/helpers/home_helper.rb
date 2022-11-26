@@ -12,6 +12,8 @@ module HomeHelper
       "フォローしていないユーザー": "NotFollowingUser",
       "いいねしたユーザー": "LikedTweetUser",
       "いいねしていないユーザー": "NotLikedTweetUser",
+      "プロフィールに含むユーザー": "IncludedWordInProfileUser",
+      "プロフィールに含まないユーザー": "NotIncludedWordInProfileUser",
     }
   end
 end

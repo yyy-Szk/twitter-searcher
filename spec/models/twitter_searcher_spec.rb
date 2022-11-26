@@ -7,7 +7,7 @@ RSpec.describe TwitterSearcher do
         token = Rails.application.credentials.twitter[:bearer_token]
         condition = create(:twitter_search_condition,
           condition_type: :main,
-          search_type: :following,
+          type: "FollowingUser",
           content: "https://twitter.com/konzo_goriki"
         )
 
@@ -24,7 +24,7 @@ RSpec.describe TwitterSearcher do
 
         condition = create(:twitter_search_condition,
           condition_type: :narrowing,
-          search_type: :following,
+          type: "FollowingUser",
           content: "https://twitter.com/yyy_szk"
         )
         searcher = TwitterSearcher.new(
@@ -37,14 +37,14 @@ RSpec.describe TwitterSearcher do
 
         r2 = searcher.search_users
 
-        expect(r1.calc(r2).pluck("username")).to(match_array(["tatoyeba", "aim2bpg", "programd_taiga", "fushifushi_y", "komagata"]))
+        expect(r1.narrowing(r2).pluck("username")).to(match_array(["tatoyeba", "aim2bpg", "programd_taiga", "fushifushi_y", "komagata"]))
       end
 
       example "", vcr: { cassette_name: "success_fetching_followers_2" } do
         token = Rails.application.credentials.twitter[:bearer_token]
         condition = create(:twitter_search_condition,
           condition_type: :main,
-          search_type: :following,
+          type: "FollowingUser",
           content: "https://twitter.com/yyy_szk"
         )
 
@@ -60,7 +60,7 @@ RSpec.describe TwitterSearcher do
 
         condition = create(:twitter_search_condition,
           condition_type: :narrowing,
-          search_type: :not_following,
+          type: "NotFollowingUser",
           content: "https://twitter.com/yyy_szk"
         )
         searcher = TwitterSearcher.new(
@@ -72,7 +72,7 @@ RSpec.describe TwitterSearcher do
         allow(searcher).to(receive(:client)).and_return(client)
 
         r2 = searcher.search_users
-        r1.calc(r2)
+        r1.narrowing(r2)
         expect(r1.data.size).to(eq(0))
       end
 
@@ -80,7 +80,7 @@ RSpec.describe TwitterSearcher do
         token = Rails.application.credentials.twitter[:bearer_token]
         condition = create(:twitter_search_condition,
           condition_type: :main,
-          search_type: :following,
+          type: "FollowingUser",
           content: "https://twitter.com/yyy_szk"
         )
 
@@ -96,7 +96,7 @@ RSpec.describe TwitterSearcher do
 
         condition = create(:twitter_search_condition,
           condition_type: :narrowing,
-          search_type: :following,
+          type: "FollowingUser",
           content: "https://twitter.com/yyy_szk"
         )
         searcher = TwitterSearcher.new(
@@ -108,7 +108,7 @@ RSpec.describe TwitterSearcher do
         allow(searcher).to(receive(:client)).and_return(client)
 
         r2 = searcher.search_users
-        r1.calc(r2)
+        r1.narrowing(r2)
         expect(r1.data.size).to(eq(364))
       end
     end

@@ -34,6 +34,10 @@
                 <%= condition.content %>
                 が
                 <%= condition.human_attribute_enum("type") %>
+              <% elsif condition.type.end_with?("IncludedWordInProfileUser") %>
+                「<%= condition.content %>」
+                を
+                <%= condition.human_attribute_enum("type") %>
               <% else %>
                 <a href=<%= condition.content %> target="__blank"><%= condition.content %></a>
                 を

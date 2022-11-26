@@ -3,7 +3,9 @@ class FollowingUser < TwitterSearchCondition
     TwitterSearchers::FollowingUserSearcher.new(self)
   end
 
-  def operator
-    "&"
+  def narrowing(data, other_data)
+    other_usernames = other_data.pluck("username")
+
+    data.select { other_usernames.include?_1["username"] }
   end
 end
