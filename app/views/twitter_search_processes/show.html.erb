@@ -15,9 +15,9 @@
         <% @main_conditions.each do |condition| %>
           <li>
             <a href=<%= condition.content %> target="__blank"><%= condition.content %></a>
-            を
+            の
             <%= condition.human_attribute_enum("type") %>
-            <% if condition.type.include?("LikedTweetUser") %>
+            <% if condition.type.include?("LikedTweetUser") || condition.type.include?("LikingUser") %>
               （直近<%= condition.num_of_days %>日のツイート）
             <% end %>
           </li>
@@ -36,12 +36,15 @@
                 <%= condition.human_attribute_enum("type") %>
               <% elsif condition.type.end_with?("IncludedWordInProfileUser") %>
                 「<%= condition.content %>」
-                を
+                の
                 <%= condition.human_attribute_enum("type") %>
               <% else %>
                 <a href=<%= condition.content %> target="__blank"><%= condition.content %></a>
-                を
+                の
                 <%= condition.human_attribute_enum("type") %>
+                <% if condition.type.include?("LikedTweetUser") || condition.type.include?("LikingUser") %>
+                （直近<%= condition.num_of_days %>日のツイート）
+                <% end %>
               <% end %>
             </li>
           <% end %>

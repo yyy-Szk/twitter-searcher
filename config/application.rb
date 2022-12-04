@@ -36,5 +36,6 @@ module App
     config.generators.system_tests = nil
     config.i18n.default_locale = :ja
     config.active_job.queue_adapter = :sidekiq
+    config.time_zone = ENV["TZ"]
   end
 end

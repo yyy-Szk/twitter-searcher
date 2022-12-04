@@ -12,10 +12,12 @@ ja:
         main: メイン条件
         narrowing: 絞り込み条件
       twitter_search_condition/type:
-        FollowingUser: フォローしているユーザー
-        NotFollowingUser: フォローしていないユーザー
-        LikedTweetUser: いいねしているユーザー
-        NotLikedTweetUser: いいねしていないユーザー
+        FollowingUser: フォロワーであるユーザー
+        NotFollowingUser: フォロワーではないユーザー
+        LikedTweetUser: ツイートをいいねしているユーザー
+        NotLikedTweetUser: ツイートをいいねしていないユーザー
         NotFollowingCurrentUser: すでにフォロー済みのユーザーを非表示
-        IncludedWordInProfileUser: プロフィールに含むユーザー
-        NotIncludedWordInProfileUser:  プロフィールに含まないユーザー
+        IncludedWordInProfileUser: 文字をプロフィールに含むユーザー
+        NotIncludedWordInProfileUser:  文字をプロフィールに含まないユーザー
+        FollowedUser: フォローしているユーザー
+        LikingUser: いいねしたユーザー

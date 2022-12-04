@@ -25,10 +25,11 @@ module TwitterSearchers
         update_client_access_token_if_needed!
 
         res = client.fetch_liking_users_by(tweet_id: tweet["id"], next_token: next_token)
+        fetched_users = res["data"].select { result.data.pluck("id").exclude?(_1["id"]) }
 
-        if res["data"].present?
-          liking_users |= res["data"].select { result.data.pluck("username").exclude?(_1["username"]) }
-          result.data |= liking_users
+        if fetched_users.present?
+          liking_users += fetched_users
+          result.data += fetched_users
         end
 
         next_token = res.dig("meta", "next_token")

@@ -9,7 +9,7 @@
       element.addEventListener("change", (event) => {
         event.preventDefault();
         // TODO: どっかで管理できるようにする
-        if(element.value === "LikedTweetUser" || element.value === "NotLikedTweetUser")
+        if(element.value === "LikedTweetUser" || element.value === "NotLikedTweetUser" || element.value === "LikingUser")
           displayNumOfDaysInput(element);
         else
           deleteNumOfDaysInput(element);
@@ -80,7 +80,7 @@
               <% 1.upto(5) do |i| %>
                 <div class=<%= "search-condition-#{i}" %>>
                   <%= f.text_field :seach_content, { name: "search_conditions[][content]", placeholder: "検索したい ユーザーのURL/文字列 を入力", class: "content-field"  } %>
-                  を
+                  の
                   <%= f.select :search_type, main_twitter_search_types, {}, { name: "search_conditions[][search_type]", class: "type-field", "data-search-type": "search_conditions", "data-index": i } %>
                 </div>
               <% end %>
@@ -90,7 +90,7 @@
               <% 1.upto(5) do |i| %>
                 <div class=<%= "narrow-condition-#{i}" %>>
                   <%= f.text_field :seach_content, { name: "narrow_conditions[][content]", placeholder: "検索したい ユーザーのURL/文字列 を入力", class: "content-field"  } %>
-                  を
+                  の
                   <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_conditions[][search_type]", "data-search-type": "narrow_conditions", "data-index": i, class: "type-field" } %>
                 </div>
               <% end %>

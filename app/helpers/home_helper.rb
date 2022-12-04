@@ -1,19 +1,24 @@
 module HomeHelper
   def main_twitter_search_types
     {
-      "フォローしているユーザー": "FollowingUser",
-      "いいねしたユーザー": "LikedTweetUser",
+      "フォロワーであるユーザー": "FollowingUser",
+      "ツイートをいいねしたユーザー": "LikedTweetUser",
+      "フォローしているユーザー": "FollowedUser",
+      "いいねしたユーザー": "LikingUser",
     }
   end
 
   def twitter_search_types_for_narrowing
+    # followed user と following user の意味を入れ替えたい
     {
-      "フォローしているユーザー": "FollowingUser",
-      "フォローしていないユーザー": "NotFollowingUser",
-      "いいねしたユーザー": "LikedTweetUser",
-      "いいねしていないユーザー": "NotLikedTweetUser",
-      "プロフィールに含むユーザー": "IncludedWordInProfileUser",
-      "プロフィールに含まないユーザー": "NotIncludedWordInProfileUser",
+      "フォロワーであるユーザー": "FollowingUser",
+      "フォロワーではないユーザー": "NotFollowingUser",
+      "ツイートをいいねしたユーザー": "LikedTweetUser",
+      "ツイートをいいねしていないユーザー": "NotLikedTweetUser",
+      "文字をプロフィールに含むユーザー": "IncludedWordInProfileUser",
+      "文字をプロフィールに含まないユーザー": "NotIncludedWordInProfileUser",
+      "フォローしているユーザー": "FollowedUser",
+      "いいねしたユーザー": "LikingUser",
     }
   end
 end

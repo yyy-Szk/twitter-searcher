@@ -7,19 +7,21 @@ require_relative "twitter_api_client/error"
 class TwitterApiClient
   API_ENDPOINT = "https://api.twitter.com"
   USERS_FIELDS = "public_metrics,id,username,description,name,protected"
-  TWEET_FIELDS = "public_metrics"
+  # attachments.poll_ids,attachments.media_keys,author_id,entities.mentions.username,geo.place_id,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id
+  EXPANSION_FIELDS = "author_id"
+  TWEET_FIELDS = "public_metrics,created_at"
   # 設定可能な項目
   # created_at,description,entities,id,location,name,pinned_tweet_id,profile_image_url,protected,public_metrics,url,username,verified,withheld
 
   class << self
     def access_token_expired?(access_token_fetch_date)
-      access_token_fetch_date > Time.now.ago(1.hour)
+      access_token_fetch_date > Time.zone.now.ago(1.hour)
     end
   end
 
   attr_reader :access_token, :refresh_token, :debug_mode
 
-  def initialize(access_token:, refresh_token:, debug_mode: false)
+  def initialize(access_token:, refresh_token: nil, debug_mode: false)
     @access_token = access_token
     @refresh_token = refresh_token
     @debug_mode = debug_mode
@@ -79,13 +81,13 @@ class TwitterApiClient
       max_results: 1000,
       "user.fields": USERS_FIELDS,
       pagination_token: next_token
-  }.compact
+    }.compact
     response = connection_get(path, params)
     # 15リクエスト/15min
     sleep(60)
+
     parse(response)
   end
-
 
   # Structを必ず返すようにする
   # originalData
@@ -104,12 +106,23 @@ class TwitterApiClient
     parse(response)
   end
 
+  def fetch_user_by_id(user_id)
+    path = "/2/users/#{user_id}"
+    params = {
+      "user.fields": USERS_FIELDS
+    }
+    response = connection_get(path, params)
+    sleep(1)
+
+    parse(response)
+  end
+
   def fetch_tweets_by(user_id:, limit:, next_token: nil)
     iso8601_format = "%Y-%m-%dT%H:%M:%SZ"
 
     path = "/2/users/#{user_id}/tweets"
     params = {
-      start_time: Time.now.ago(limit).strftime(iso8601_format),
+      start_time: Time.zone.now.ago(limit).strftime(iso8601_format),
       max_results: 100,
       exclude: "retweets,replies",
       "tweet.fields": TWEET_FIELDS,
@@ -127,6 +140,21 @@ class TwitterApiClient
     params = {
       pagination_token: next_token,
       "user.fields": USERS_FIELDS
+    }.compact
+    response = connection_get(path, params)
+
+    # 75リクエスト/15min
+    sleep(12)
+    parse(response)
+  end
+
+  def fetch_liking_tweets_by(user_id:, next_token: nil)
+    path = "/2/users/#{user_id}/liked_tweets"
+    params = {
+      max_results: 100,
+      pagination_token: next_token,
+      "expansions": EXPANSION_FIELDS,
+      "tweet.fields": TWEET_FIELDS,
     }.compact
     response = connection_get(path, params)
 

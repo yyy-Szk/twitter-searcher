@@ -18,7 +18,7 @@ class Oauth::TwitterController < ApplicationController
     current_user.update(
       twitter_access_token: res["access_token"],
       twitter_refresh_token: res["refresh_token"],
-      fetched_access_token_at: Time.now
+      fetched_access_token_at: Time.zone.now
     )
 
     redirect_to new_twitter_search_process_url
