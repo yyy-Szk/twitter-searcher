@@ -8,11 +8,11 @@ module TwitterSearchers
       tweets = []
       next_token = nil
       target_date = Time.zone.now.ago(limit)
-      100.times do
+      1000.times do
         update_client_access_token_if_needed!
 
         res = client.fetch_liking_tweets_by(user_id: target_user_id, next_token: next_token)
-        fetched_tweets = res["data"].select { _1["created_at"] > target_date }
+        fetched_tweets = res["data"]&.select { _1["created_at"] > target_date } || []
 
         tweets.concat(fetched_tweets) if fetched_tweets.present?
 
