@@ -4,13 +4,16 @@ class TwitterSearchProcess < ApplicationRecord
   has_many :twitter_search_results, dependent: :destroy
 
   enum status: { progressing: 0, will_finish: 1, finished: 2 }, _prefix: true
+  enum process_type: { user: 0, tweet: 1 }, _prefix: true
 
   class << self
-    def create_with_conditions(user, search_condition_params, narrow_condition_params, options = {})
+    def create_with_conditions(
+      user, process_type, search_condition_params, narrow_condition_params, options = {}
+    )
       search_condition_params = search_condition_params.delete_if { _1["content"].strip.empty? }
       narrow_condition_params = narrow_condition_params.delete_if { _1["content"].strip.empty? }
 
-      process = self.new(user: user, status: :progressing)
+      process = self.new(user: user, status: :progressing, process_type: process_type)
       search_condition_params.each do
         process.twitter_search_conditions.new(
           condition_type: :main,
@@ -36,6 +39,7 @@ class TwitterSearchProcess < ApplicationRecord
           type: "NotFollowingCurrentUser",
         )
       end
+
       process.save
 
       process
@@ -43,6 +47,13 @@ class TwitterSearchProcess < ApplicationRecord
   end
 
   def execute!
+    case process_type
+    when "user" then execute_searching_user!
+    when "tweet" then execute_searching_tweet!
+    end
+  end
+
+  def execute_searching_user!
     message = ""
 
     p "絞り込み条件取得開始"
@@ -73,7 +84,7 @@ class TwitterSearchProcess < ApplicationRecord
 
         if result.data.present?
           results.each { result.narrowing(_1) }
-          p "ユーザー取得中"
+          p "取得中"
 
           data = result.data.select { feched_users.pluck("username").exclude?(_1["username"]) }
           data = data.select { _1["protected"] == false }
@@ -98,7 +109,48 @@ class TwitterSearchProcess < ApplicationRecord
 
       feched_users | search_result.data
     end
-    p "ユーザー取得終了"
+    p "取得終了"
+  rescue TwitterApiClient::Error => e
+    p "=========="
+    Rails.logger.info e.backtrace
+    p "=========="
+    Rails.logger.info e.message
+    message = e.message
+    p "=========="
+
+    self.update error_class: e.class
+  rescue => e
+    p "=========="
+    Rails.logger.info e.backtrace
+    p "=========="
+    Rails.logger.info e.message
+    message = "予期せぬエラーが発生しました。入力値をお確かめの上、再実行してください。"
+    p "=========="
+
+    self.update error_class: e.class
+  ensure
+    self.update progress_rate: 100, status: :finished, error_message: message
+  end
+
+  def execute_searching_tweet!
+    message = ""
+
+    search_conditions.first.search do |result, progress_rate|
+      # 結果が来る。
+      # 結果を並び替える（明日やる）
+      # dbに反映する
+      data = result.data
+      if data.present?
+        # 一気にimportで入れたいけど、どうするか。
+        data.each_slice(100) do |sliced_data|
+          self.twitter_search_results.create(data: sliced_data)
+        end
+      end
+      # payload = twitter_search_process.payload | result.data
+      # twitter_search_process.update payload: twitter_search_process.payload | payload #, progress_rate
+    end
+
+    p "取得終了"
   rescue TwitterApiClient::Error => e
     p "=========="
     Rails.logger.info e.backtrace

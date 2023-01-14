@@ -66,51 +66,21 @@
     <p style="margin-left: 30px"><%= link_to "ログアウト", "/logout", method: :delete %></p>
 
     <% if @is_authenticated %>
-      <div style="margin-top: 50px; margin-left: 90px">
-        <h2>ユーザーを検索する</h2>
+      <% flash.each do |message_type, message| %>
+        <p class=<%= "flash-#{message_type}" %>><%= message %></p>
+      <% end %>
 
-        <% unless current_user.has_active_process? %>
-          <%= form_with(url: twitter_search_processes_path, local: true, class: "search-form") do |f| %>
-            <div class="search-form-content">
+      <% if current_user.has_active_process? %>
+        <p>検索処理が進行中です</p>
 
-              <% flash.each do |message_type, message| %>
-                <p class=<%= "flash-#{message_type}" %>><%= message %></p>
-              <% end %>
-
-              <% 1.upto(5) do |i| %>
-                <div class=<%= "search-condition-#{i}" %>>
-                  <%= f.text_field :seach_content, { name: "search_conditions[][content]", placeholder: "検索したい ユーザーのURL/文字列 を入力", class: "content-field"  } %>
-                  の
-                  <%= f.select :search_type, main_twitter_search_types, {}, { name: "search_conditions[][search_type]", class: "type-field", "data-search-type": "search_conditions", "data-index": i } %>
-                </div>
-              <% end %>
-
-              <p>かつ</p>
-
-              <% 1.upto(5) do |i| %>
-                <div class=<%= "narrow-condition-#{i}" %>>
-                  <%= f.text_field :seach_content, { name: "narrow_conditions[][content]", placeholder: "検索したい ユーザーのURL/文字列 を入力", class: "content-field"  } %>
-                  の
-                  <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_conditions[][search_type]", "data-search-type": "narrow_conditions", "data-index": i, class: "type-field" } %>
-                </div>
-              <% end %>
-
-              <div>
-                <%= f.label :remove_following_user, "フォロー済みのユーザーを表示しない" %>
-                <%= f.check_box :remove_following_user, { name: "remove_following_user", checked: false }, true, false %>
-              </div>
-
-              <%= f.submit "検索" %>
-            </div>
-          <% end %>
-        <% else %>
-          <p>検索処理が進行中です</p>
-
-          <% current_user.active_process.each do |process| %>
-            <p><%= link_to "詳細ページ", "/twitter_search_processes/#{process.id}" %></p>
-          <% end %>
+        <% current_user.active_process.each do |process| %>
+          <p><%= link_to "詳細ページ", "/twitter_search_processes/#{process.id}" %></p>
         <% end %>
-      </div>
+      <% elsif @process_type == "tweet" %>
+        <%= render "search_tweet" %>
+      <% else %>
+        <%= render "search_user" %>
+      <% end %>
     <% else %>
       <% client_id = Rails.application.credentials.twitter.dig(:oauth, :client_id) %>
       <% redirect_uri = CGI.escape(Rails.application.credentials.twitter.dig(:oauth, :callback_url)) %>

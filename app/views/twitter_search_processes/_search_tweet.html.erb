@@ -1,0 +1,20 @@
+<div style="margin-top: 50px; margin-left: 90px">
+  <h2>ツイートを検索する</h2>
+
+  <%= form_with(url: twitter_search_processes_path, local: true, class: "search-form") do |f| %>
+    <div class="search-form-content">
+
+      <div class=<%= "search-condition-1" %>>
+        <%= f.text_field :seach_content, { name: "search_conditions[][content]", placeholder: "検索したい ユーザーのURL/文字列 を入力", class: "content-field"  } %>
+        の過去<%= f.number_field :num_of_days, { name: "search_conditions[][num_of_days]", value: "30", min: 1, max: 365, style: "width: 38px" } %>日のツイートを取得（いいね/リツイートの多い順）
+
+        <%= f.hidden_field :search_type, { name: "search_conditions[][search_type]", value: "TwitterUserTimeline" } %>
+      </div>
+      <%= f.hidden_field :process_type, value: "tweet" %>
+
+      <%= f.submit "検索" %>
+    </div>
+  <% end %>
+
+  <p><%= link_to "ユーザーを検索する", "/twitter_search_processes/new?process_type=user" %></p>
+</div>

@@ -21,3 +21,4 @@ ja:
         NotIncludedWordInProfileUser:  文字をプロフィールに含まないユーザー
         FollowedUser: フォローしているユーザー
         LikingUser: いいねしたユーザー
+        TwitterUserTimeline: 過去のツイートをいいね/リツイートが多い順に取得

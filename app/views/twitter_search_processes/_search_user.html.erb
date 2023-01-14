@@ -1,0 +1,36 @@
+<div style="margin-top: 50px; margin-left: 90px">
+  <h2>ユーザーを検索する</h2>
+
+  <%= form_with(url: twitter_search_processes_path, local: true, class: "search-form") do |f| %>
+    <div class="search-form-content">
+      <% 1.upto(5) do |i| %>
+        <div class=<%= "search-condition-#{i}" %>>
+          <%= f.text_field :seach_content, { name: "search_conditions[][content]", placeholder: "検索したい ユーザーのURL/文字列 を入力", class: "content-field"  } %>
+          の
+          <%= f.select :search_type, main_twitter_search_types, {}, { name: "search_conditions[][search_type]", class: "type-field", "data-search-type": "search_conditions", "data-index": i } %>
+        </div>
+      <% end %>
+
+      <p>かつ</p>
+
+      <% 1.upto(5) do |i| %>
+        <div class=<%= "narrow-condition-#{i}" %>>
+          <%= f.text_field :seach_content, { name: "narrow_conditions[][content]", placeholder: "検索したい ユーザーのURL/文字列 を入力", class: "content-field"  } %>
+          の
+          <%= f.select :search_type, twitter_search_types_for_narrowing, {}, { name: "narrow_conditions[][search_type]", "data-search-type": "narrow_conditions", "data-index": i, class: "type-field" } %>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :remove_following_user, "フォロー済みのユーザーを表示しない" %>
+        <%= f.check_box :remove_following_user, { name: "remove_following_user", checked: false }, true, false %>
+      </div>
+      <%= f.hidden_field :process_type, value: "user" %>
+
+      <%= f.submit "検索" %>
+    </div>
+  <% end %>
+
+  <p><%= link_to "ツイートを検索する", "/twitter_search_processes/new?process_type=tweet" %></p>
+
+</div>

@@ -1,0 +1,20 @@
+<% results.each do |twitter_search_result| %>
+  <% twitter_search_result.data.each do |result| %>
+    <div class="user-info">
+      <h3>
+        <a href=<%= "https://twitter.com/#{result["username"]}" %> target="__blank">
+          <%= result["name"] %>
+          <span class="username"><%= "@#{result["username"]}  " %></span>
+          </a>
+      </h3>
+
+      <p class="description"><%= result["description"] %></p>
+
+      <p class="public-metrics">
+        フォロー数: <%= result["public_metrics"]["following_count"] %> /
+        フォロワー数: <%= result["public_metrics"]["followers_count"] %> /
+        ツイート数: <%= result["public_metrics"]["tweet_count"] %>
+      </p>
+    </div>
+  <% end %>
+<% end %>
