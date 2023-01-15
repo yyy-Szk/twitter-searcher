@@ -16,10 +16,6 @@ class TwitterSearchCondition < ApplicationRecord
     end
   end
 
-  def narrowing
-    raise NotImplementedError
-  end
-
   def searcher
     raise NotImplementedError
   end

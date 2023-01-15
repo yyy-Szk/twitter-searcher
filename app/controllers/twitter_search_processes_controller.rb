@@ -4,12 +4,13 @@ class TwitterSearchProcessesController < ApplicationController
 
   def new
     @is_authenticated = !(params[:need_auth] == "true")
+    @process_type = params[:process_type]
   end
 
   def show
     @process = TwitterSearchProcess.find(params[:id])
     # 一つの結果には、最大で500まで入れられるようにする。
-    @results = TwitterSearchResult.where(twitter_search_process: @process).page(params[:page]).per(3)
+    @results = @process.twitter_search_results.page(params[:page]).per(3)
     @main_conditions = @process.twitter_search_conditions.condition_type_main
     @narrowing_conditions = @process.twitter_search_conditions.condition_type_narrowing
   end
@@ -17,7 +18,8 @@ class TwitterSearchProcessesController < ApplicationController
   def create
     # 文字列で統一
     options = { "remove_following_user" => params["remove_following_user"] }
-    process = TwitterSearchProcess.create_with_conditions(current_user, search_condition_params, narrow_condition_params, options)
+
+    process = TwitterSearchProcess.create_with_conditions(current_user, params[:process_type], search_condition_params, narrow_condition_params, options)
     if process.persisted?
       SearchTwitterUserJob.perform_later(process)
       redirect_to action: "show", id: process.id
@@ -36,15 +38,11 @@ class TwitterSearchProcessesController < ApplicationController
   private
 
   def search_condition_params
-    params[:search_conditions].map do
-      _1.permit(:content, :search_type, :num_of_days)
-    end
+    params[:search_conditions].map { _1.permit(:content, :search_type, :num_of_days) } || []
   end
 
   def narrow_condition_params
-    params[:narrow_conditions].map do
-      _1.permit(:content, :search_type, :num_of_days)
-    end
+    params[:narrow_conditions]&.map { _1.permit(:content, :search_type, :num_of_days) } || []
   end
 
   def validate

@@ -1,0 +1,19 @@
+<% results.each do |twitter_search_result| %>
+  <% twitter_search_result.data.each do |result| %>
+    <div class="result-info">
+      <p><%= result["text"] %></p>
+      <p><%= result["created_at"].in_time_zone.strftime("%Y-%m-%d %H:%M") %></p>
+
+      <p class="public-metrics">
+        いいね数: <%= result["public_metrics"]["like_count"] %> /
+        リツイート数: <%= result["public_metrics"]["retweet_count"] %> /
+        引用リツイート数: <%= result["public_metrics"]["quote_count"] %> /
+        リプライ数: <%= result["public_metrics"]["reply_count"] %> /
+        インプレッション数: <%=
+          val = result["public_metrics"]["impression_count"]
+          val.to_i == 0 ? "取得できません。" : val
+        %>
+      </p>
+    </div>
+  <% end %>
+<% end %>
