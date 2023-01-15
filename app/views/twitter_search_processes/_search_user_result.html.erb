@@ -1,6 +1,6 @@
 <% results.each do |twitter_search_result| %>
   <% twitter_search_result.data.each do |result| %>
-    <div class="user-info">
+    <div class="result-info">
       <h3>
         <a href=<%= "https://twitter.com/#{result["username"]}" %> target="__blank">
           <%= result["name"] %>

@@ -17,8 +17,10 @@ module TwitterSearchers
         break if next_token.blank?
       end
 
+      sort_tweets!(tweets)
       result = Result.new(@twitter_search_condition, tweets)
       progress_rate = 0
+
       yield(result, progress_rate) if block_given?
 
       result
@@ -28,6 +30,19 @@ module TwitterSearchers
 
     def limit
       twitter_search_condition.num_of_days.days
+    end
+
+    # resultクラスにソート用メソッドを持たせるほうがいいかも??
+    def sort_tweets!(result_data)
+      result_data.sort_by! do
+        [
+          -_1.dig("public_metrics", "like_count"),
+          -_1.dig("public_metrics", "retweet_count"),
+          -_1.dig("public_metrics", "quote_count"),
+          -_1.dig("public_metrics", "impression_count"),
+          -_1.dig("public_metrics", "reply_count")
+        ]
+      end
     end
   end
 end

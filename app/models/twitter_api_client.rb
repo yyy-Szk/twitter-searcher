@@ -211,6 +211,6 @@ class TwitterApiClient
   end
 
   def retrieve_username(username)
-    username.sub("https://twitter.com/", "").sub(/(\?.*)?$/, "").strip
+    username.sub(/^.*https:\/\/(.*\.)?twitter.com\//, "").sub(/(\?.*)?$/, "").strip
   end
 end

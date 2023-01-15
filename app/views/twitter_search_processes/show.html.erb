@@ -69,7 +69,7 @@
 
       <% elsif @process.status_will_finish? %>
         <p class="result-count">中断処理を実行中です...</p>
-      <% else %>
+      <% elsif @process.process_type_user? %>
         <%= link_to "処理を中断する", "/twitter_search_processes/#{@process.id}", method: :put %>
       <% end %>
     </div>

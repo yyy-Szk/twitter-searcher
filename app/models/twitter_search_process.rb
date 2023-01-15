@@ -136,9 +136,6 @@ class TwitterSearchProcess < ApplicationRecord
     message = ""
 
     search_conditions.first.search do |result, progress_rate|
-      # 結果が来る。
-      # 結果を並び替える（明日やる）
-      # dbに反映する
       data = result.data
       if data.present?
         # 一気にimportで入れたいけど、どうするか。
