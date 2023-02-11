@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  web:
+  web: &app
     build: .
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
@@ -12,6 +12,7 @@ services:
       EDITOR: vi
       TZ: Asia/Tokyo
       REDIS_URL: redis://redis:6379
+      WEBPACKER_DEV_SERVER_HOST: webpacker
     ports:
       - "3000:3000"
     depends_on:
@@ -40,6 +41,17 @@ services:
     volumes:
       - "redis_volume:/data"
     command: redis-server --appendonly yes
+  webpacker:
+    <<: *app
+    depends_on:
+      - web
+    environment:
+      - NODE_ENV=development
+      - RAILS_ENV=development
+      - WEBPACKER_DEV_SERVER_HOST=0.0.0.0
+    command: ./bin/webpack-dev-server
+    ports:
+      - "3035:3035"
   db:
     image: postgres
     environment:
