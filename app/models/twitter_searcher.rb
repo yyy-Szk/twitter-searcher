@@ -20,9 +20,10 @@ class TwitterSearcher
   def initialize(twitter_search_condition)
     @twitter_search_condition = twitter_search_condition
     @user = twitter_search_condition.user
+    @fetched_access_token_at = @user.fetched_access_token_at
     @access_token = @user.twitter_access_token
     @refresh_token = @user.twitter_refresh_token
-    @fetched_access_token_at = @user.fetched_access_token_at
+    update_client_access_token_if_needed!
   end
 
   def search(&block)

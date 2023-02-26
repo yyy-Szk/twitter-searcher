@@ -1,0 +1,109 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  window.addEventListener("load", () => {
+    addEventListenerToTypeField();
+  });
+
+  function addEventListenerToTypeField() {
+    const selectTags = document.getElementsByClassName("type-field");
+    Array.prototype.forEach.call(selectTags, element => {
+      element.addEventListener("change", (event) => {
+        event.preventDefault();
+        // TODO: どっかで管理できるようにする
+        if(element.value === "LikedTweetUser" || element.value === "NotLikedTweetUser" || element.value === "LikingUser")
+          displayNumOfDaysInput(element);
+        else
+          deleteNumOfDaysInput(element);
+      })
+    })
+  }
+
+  function displayNumOfDaysInput(element) {
+    const parentNode = element.closest("div");
+    const { searchType, index } = element.dataset
+    const numOfDaysInput = findNumOfDaysInput(searchType, index)
+
+    if(numOfDaysInput === null)
+      parentNode.appendChild(createNumOfDaysInput(searchType, index))
+  }
+
+  function createNumOfDaysInput(searchType, index) {
+    const numOfDaysInput = document.createElement("input");
+    numOfDaysInput.setAttribute("type", "number");
+    numOfDaysInput.setAttribute("min", 1);
+    numOfDaysInput.setAttribute("max", 90);
+    numOfDaysInput.setAttribute("style", "width: 38px");
+    numOfDaysInput.setAttribute("name", `${searchType}[][num_of_days]`);
+    numOfDaysInput.setAttribute("value", "1");
+
+    const span = document.createElement("span");
+    span.setAttribute("data-search-type", searchType);
+    span.setAttribute("data-index", index);
+    span.appendChild(document.createTextNode("（直近"))
+    span.appendChild(numOfDaysInput)
+    span.appendChild(document.createTextNode("日のツイート）"))
+
+    return span;
+  }
+
+  function deleteNumOfDaysInput(element) {
+    const { searchType, index } = element.dataset
+    const numOfDaysInput = findNumOfDaysInput(searchType, index)
+
+    if(numOfDaysInput != null)
+      numOfDaysInput.remove();
+  }
+
+  function findNumOfDaysInput(searchType, index) {
+    const numOfDaysInput = document.querySelector(`span[data-search-type="${searchType}"][data-index="${index}"]`)
+
+    return numOfDaysInput
+  }
+</script>
+
+<div class="home-wrapper">
+  <h1 style="margin: 30px 0 0 30px;"><a href="/twitter_search_processes/new">検索ページ</a></h1>
+
+    <p style="margin-left: 30px"><%= link_to "ログアウト", "/logout", method: :delete %></p>
+
+    <% if @is_authenticated %>
+      <% flash.each do |message_type, message| %>
+        <p class=<%= "flash-#{message_type}" %>><%= message %></p>
+      <% end %>
+
+      <% if current_user.has_active_process? %>
+        <p>検索処理が進行中です</p>
+
+        <% current_user.active_process.each do |process| %>
+          <p><%= link_to "詳細ページ", "/twitter_search_processes/#{process.id}" %></p>
+        <% end %>
+      <% elsif @process_type == "tweet" %>
+        <%= render "search_tweet" %>
+      <% else %>
+        <%= render "search_user" %>
+      <% end %>
+    <% else %>
+      <% client_id = Rails.application.credentials.twitter.dig(:oauth, :client_id) %>
+      <% redirect_uri = CGI.escape(Rails.application.credentials.twitter.dig(:oauth, :callback_url)) %>
+      <% scopes = "tweet.read%20users.read%20like.read%20follows.read%20follows.write%20offline.access" %>
+      <% auth_url = "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=#{client_id}&redirect_uri=#{redirect_uri}&scope=#{scopes}&state=abc&code_challenge=abc&code_challenge_method=plain" %>
+      <p>検索するには、<%= link_to 'Twitter認証', auth_url, method: :get %>をしてください</p>
+    <% end %>
+</div>

@@ -4,6 +4,9 @@ ja:
       twitter_search_condition: ツイッター検索条件
       twitter_search_result: ツイッター検索結果
     attributes:
+      user:
+        uid: ユーザーID
+        password: パスワード
       twitter_search_condition:
         condition_type: 条件の種類
         content: 検索対象

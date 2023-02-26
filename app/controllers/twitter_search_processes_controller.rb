@@ -8,11 +8,25 @@ class TwitterSearchProcessesController < ApplicationController
   end
 
   def show
-    @process = TwitterSearchProcess.find(params[:id])
-    # 一つの結果には、最大で500まで入れられるようにする。
-    @results = @process.twitter_search_results.page(params[:page]).per(3)
-    @main_conditions = @process.twitter_search_conditions.condition_type_main
-    @narrowing_conditions = @process.twitter_search_conditions.condition_type_narrowing
+    @twitter_search_process_id = params[:id]
+    @auth_url = auth_url
+  end
+
+  def json_data
+    process = TwitterSearchProcess.find(params[:id])
+    total_count = process.twitter_search_results.sum { _1.data.count }
+
+    render json: {
+      process: process,
+      total_count: total_count,
+      results: process.twitter_search_results.page(params[:page]).per(1).flat_map(&:data),
+      main_conditions: process.twitter_search_conditions.condition_type_main.map {
+        JSON.parse(_1.to_json).merge(type: _1.type)
+      },
+      narrowing_conditions: process.twitter_search_conditions.condition_type_narrowing.map {
+        JSON.parse(_1.to_json).merge(type: _1.type)
+      }
+    }
   end
 
   def create
@@ -37,6 +51,14 @@ class TwitterSearchProcessesController < ApplicationController
 
   private
 
+  def auth_url
+    client_id = Rails.application.credentials.twitter.dig(:oauth, :client_id)
+    redirect_uri = CGI.escape(Rails.application.credentials.twitter.dig(:oauth, :callback_url))
+    scopes = "tweet.read%20users.read%20like.read%20follows.read%20follows.write%20offline.access"
+
+    "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=#{client_id}&redirect_uri=#{redirect_uri}&scope=#{scopes}&state=abc&code_challenge=abc&code_challenge_method=plain"
+  end
+
   def search_condition_params
     params[:search_conditions].map { _1.permit(:content, :search_type, :num_of_days) } || []
   end
@@ -57,9 +79,5 @@ class TwitterSearchProcessesController < ApplicationController
     #   flash[:alert] = "検索対象のユーザーは、最低一つは入力してください。"
     #   render action: :new and return
     # end
-  end
-
-  def require_login
-    redirect_to login_url unless logged_in?
   end
 end
