@@ -1,5 +1,4 @@
 import * as React from 'react';
-import TextField from '@mui/material/TextField';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -103,10 +102,15 @@ const NarrowConditionGridItem = ({ narrow_conditions }) => {
           {
             narrow_conditions.map((condition, i) => {
               const displayNumOfDays = ["LikedTweetUser", "NotLikedTweetUser", "LikingUser", "TwitterUserTimeline"].includes(condition.type)
+              const notLink = ["NotFollowingCurrentUser", "IncludedWordInProfileUser", "NotIncludedWordInProfileUser"].includes(condition.type)
 
               return (
                 <Typography variant="p" key={`narrow-condition-${i}`}>
-                  <Link href={condition.content} target="_blank" rel="noopener">{condition.content}</Link>
+                  {
+                    notLink ?
+                      condition.content :
+                      <Link href={condition.content} target="_blank" rel="noopener">{condition.content}</Link>
+                  }
                   の
                   {conditionTypeJa[condition.type]}
                   { displayNumOfDays && !!condition.num_of_days && `（直近${condition.num_of_days}日のツイート）`}
@@ -148,14 +152,16 @@ const ShowResultContainer = ({ jsonData, pageIndex, setPageIndex, authUrl }) => 
       <Box mb={1}>
         <Typography variant="p">
           進行状況: {(process.status === "will_finish") ? "中断処理を実行中です..." :
-                    (process.progress_rate === 100) ? "取得完了" : "現在取得中..." } /
+                    (process.progress_rate === 100) ? `取得完了${!!process.error_message ? `(${process.error_message})` : ""}` : "現在取得中..." } /
           表示数: {jsonData.results.length} /
           ヒット数: {jsonData.total_count}
           {
             (process.progress_rate != 100 && process.status != "will_finish") &&
+            <a data-method='put' href={`/twitter_search_processes/${process.id}`}>
               <Typography variant="span" sx={{ ml: 2 }}>
-                <a data-method='put' href={`/twitter_search_processes/${process.id}`}>(処理を中断する)</a>
+                (処理を中断する)
               </Typography>
+            </a>
           }
         </Typography>
       </Box>

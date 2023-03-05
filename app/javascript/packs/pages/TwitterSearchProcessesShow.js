@@ -1,13 +1,9 @@
 import * as React from 'react';
 import API from "../lib/api";
-import Grid from '@mui/material/Grid';
-import Paper from '@mui/material/Paper';
 
 import Dashboard from '../components/dashboard/Dashboard';
 
-
-
-const TwitterSearchProcessesShow = ({ dataset: { authToken, searchProcessId, authUrl } }) => {
+const TwitterSearchProcessesShow = ({ dataset: { authToken, searchProcessId, authUrl, activeProcessId, needAuth } }) => {
   const [jsonData, setJsonData] = React.useState({});
   const [pageIndex, setPageIndex] = React.useState(1);
 
@@ -28,6 +24,8 @@ const TwitterSearchProcessesShow = ({ dataset: { authToken, searchProcessId, aut
         pageIndex={pageIndex}
         setPageIndex={setPageIndex}
         authUrl={authUrl}
+        activeProcessId={activeProcessId}
+        needAuth={needAuth}
       />
     </>
   );

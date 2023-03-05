@@ -3,4 +3,7 @@
   data-auth-Token=<%= form_authenticity_token %>
   data-auth-url=<%= @auth_url %>
   data-search-process-id=<%= @twitter_search_process_id %>
+  <%= current_user.active_process.first&.id &&
+    "data-active-process-id=#{current_user.active_process.first&.id}" %>
+  data-need-auth=<%= current_user.twitter_refresh_token.blank? %>
 ></div>
