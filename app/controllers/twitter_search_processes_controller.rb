@@ -3,8 +3,8 @@ class TwitterSearchProcessesController < ApplicationController
   before_action :require_login
 
   def new
-    @is_authenticated = !(params[:need_auth] == "true")
     @process_type = params[:process_type]
+    @auth_url = auth_url
   end
 
   def show

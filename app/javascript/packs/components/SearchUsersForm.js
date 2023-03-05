@@ -7,6 +7,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
+import Checkbox from '@mui/material/Checkbox'
 import AuthenticityTokenInput from './AuthenticityTokenInput';
 
 const mainConditionMinSize = 1
@@ -130,19 +131,23 @@ const NarrowConditionContainer = () => {
   )
 }
 
-const SearchUsersForm = ({ authToken }) => {
-  const handleSubmit = (event) => {
-    event.submit();
+const SearchUsersForm = ({ authToken, setInProgress }) => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    setInProgress(true);
+    document.getElementById('users-form').submit();
   };
   const [mainConditionCount, setMainConditionCount] = React.useState(mainConditionMinSize)
   const [narrowConditionCount, setNarrowConditionCount] = React.useState(narrowConditionMinSize)
+  const [removeFollowingUser, setRemoveFollowingUser] = React.useState(false)
 
   return (
     <>
       {/* こういうページのデスクリプション的なやつは別のpagerにする */}
       <Typography component="h2" mb={4}>条件を指定してユーザーを検索し、マッチしたユーザーの情報を取得します</Typography>
 
-      <Box component="form" onSubmit={handleSubmit} noValidate action="/twitter_search_processes" method="post" sx={{ mt: 1 }}>
+      <Box component="form" id="users-form" onSubmit={handleSubmit} noValidate action="/twitter_search_processes" method="post" sx={{ mt: 1 }} target="_blank">
         {
           [...Array(mainConditionCount)].map((_, i) =>
             <MainConditionContainer key={`main-condition-${i}`} containerKey={""} />
@@ -174,6 +179,12 @@ const SearchUsersForm = ({ authToken }) => {
           narrowConditionCount > narrowConditionMinSize &&
             <Button variant="outlined" sx={{ mt: 3, mb: 2 }} onClick={() => setNarrowConditionCount(narrowConditionCount - 1)}>-</Button>
         }
+
+        <Box>
+          <Checkbox onChange={() => setRemoveFollowingUser(!removeFollowingUser)} />
+          <Typography component="span">フォロー済みのユーザーを表示しない</Typography>
+          <InputBase type="hidden" name="remove_following_user" value={removeFollowingUser} />
+        </Box>
 
         <InputBase type="hidden" name="process_type" value="user" />
         <AuthenticityTokenInput authToken={authToken} />

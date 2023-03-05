@@ -12,11 +12,11 @@ const ShowUsersContainer = ({ results }) => {
   const userGridItems = results.map((result, index) => (
     <Grid item xs={12} key={`result-${index}`}>
       <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-        <Link rel="noopener" href={`https://twitter.com/${result.username}`} target="_blank">
           <Typography variant="h3" mb={2}>
-            {result.name}<Typography variant="span" ml={1}>@{result.username}</Typography>
+            <Link rel="noopener" href={`https://twitter.com/${result.username}`} target="_blank">
+              {result.name}<Typography variant="span" ml={1}>@{result.username}</Typography>
+            </Link>
           </Typography>
-        </Link>
 
         <Typography variant="p" mb={2}>
           {result.description}

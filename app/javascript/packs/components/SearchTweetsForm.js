@@ -7,9 +7,12 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import AuthenticityTokenInput from './AuthenticityTokenInput';
 
-const SearchTweetsForm = ({ authToken }) => {
-  const handleSubmit = (event) => {
-    event.submit();
+const SearchTweetsForm = ({ authToken, setInProgress }) => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    setInProgress(true);
+    document.getElementById('tweets-form').submit();
   };
 
   return (
@@ -17,7 +20,7 @@ const SearchTweetsForm = ({ authToken }) => {
       {/* こういうページのデスクリプション的なやつは別のpagerにする */}
       <Typography component="p" mb={4}>ユーザーのツイートを、いいね/リツイートの多い順に取得します</Typography>
 
-      <Box component="form" onSubmit={handleSubmit} noValidate action="/twitter_search_processes" method="post" sx={{ mt: 1 }}>
+      <Box component="form" id="tweets-form" onSubmit={handleSubmit} noValidate action="/twitter_search_processes" method="post" sx={{ mt: 1 }} target="_blank">
         <Box>
           <TextField
             required

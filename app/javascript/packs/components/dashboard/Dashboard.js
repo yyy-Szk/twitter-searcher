@@ -82,19 +82,34 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const mdTheme = createTheme();
 
-function DashboardContent({ title, authToken, specifiedPage, jsonData, pageIndex, setPageIndex, authUrl }) {
+function DashboardContent(
+  { title, authToken, specifiedPage, jsonData, pageIndex, setPageIndex, authUrl, activeProcessId, needAuth }
+) {
   const [open, setOpen] = React.useState(false);
   const [pageContainer, setPageContainer] = React.useState(specifiedPage || "search-users");
+  const [inProgress, setInProgress] = React.useState(!!activeProcessId);
+
+  if (inProgress) {
+    console.log("progress")
+    setTimeout(() => window.location.reload(), 30000);
+  }
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
   const page = (() => {
+    if (JSON.parse(needAuth)) {
+      return <Box>
+        使用するには<Link href={authUrl}>認証</Link>してください
+      </Box>
+    }
+
     switch (pageContainer) {
       case "search-tweets":
-        return <SearchTweetsContainer authToken={authToken} />
+        return <SearchTweetsContainer authToken={authToken} inProgress={inProgress} setInProgress={setInProgress} activeProcessId={activeProcessId} />
       case "search-users":
-        return <SearchUsersContainer authToken={authToken} />
+        return <SearchUsersContainer authToken={authToken} inProgress={inProgress} setInProgress={setInProgress} activeProcessId={activeProcessId} />
       case "show-result":
         return <ShowResultContainer jsonData={jsonData} pageIndex={pageIndex} setPageIndex={setPageIndex} authUrl={authUrl} />
     }
@@ -168,7 +183,7 @@ function DashboardContent({ title, authToken, specifiedPage, jsonData, pageIndex
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             {
-              (pageContainer != specifiedPage) &&
+              (!!specifiedPage && (pageContainer != specifiedPage)) &&
               <Button
                 variant="outlined"
                 sx={{ mt: 3, mb: 2 }}
@@ -187,7 +202,9 @@ function DashboardContent({ title, authToken, specifiedPage, jsonData, pageIndex
   );
 }
 
-export default function Dashboard({ title, authToken, specifiedPage, jsonData, pageIndex, setPageIndex, authUrl }) {
+export default function Dashboard(
+  { title, authToken, specifiedPage, jsonData, pageIndex, setPageIndex, authUrl, activeProcessId, needAuth }
+) {
   return (
     <DashboardContent
       title={title}
@@ -197,6 +214,8 @@ export default function Dashboard({ title, authToken, specifiedPage, jsonData, p
       pageIndex={pageIndex}
       setPageIndex={setPageIndex}
       authUrl={authUrl}
+      activeProcessId={activeProcessId}
+      needAuth={needAuth}
     />
   )
 }
