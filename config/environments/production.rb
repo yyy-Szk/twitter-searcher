@@ -120,4 +120,5 @@ Rails.application.configure do
   config.hosts << ".herokuapp.com"
   config.hosts << ".onrender.com"
   config.hosts << "twitter-searcher.onrender.com"
+  config.hosts << "twitter-searcher-app-test.onrender.com"
 end
