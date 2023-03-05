@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   resources :twitter_search_processes, only: %i[new show create update]
+  get "twitter_search_processes/:id/json_data", to: "twitter_search_processes#json_data"
 
   get "/login", to: 'sessions#new'
   delete "/logout", to: 'sessions#destroy'

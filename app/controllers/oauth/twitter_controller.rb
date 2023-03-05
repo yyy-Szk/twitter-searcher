@@ -5,7 +5,7 @@ class Oauth::TwitterController < ApplicationController
       client_id: "#{twitter_credentials.dig(:oauth, :client_id)}",
       grant_type: "authorization_code",
       code: params["code"],
-      redirect_uri: "#{twitter_credentials.dig(:oauth, :callback_url)}",
+      redirect_uri: ENV["TWITTER_CALLBACK"] || "#{twitter_credentials.dig(:oauth, :callback_url)}",
       code_verifier: "abc"
     }
 

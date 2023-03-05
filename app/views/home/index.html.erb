@@ -2,6 +2,8 @@
 <div class="home-wrapper">
   <h1 style="margin: 30px 0 0 30px;"><a href="/">検索ページ</a></h1>
 
+  <div id='app' data-message="こんにちはです"></div>
+
   <% if logged_in? %>
     <p style="margin-left: 30px"><%= link_to "ログアウト", "/logout", method: :delete %></p>
     <p>検索ページは<%= link_to "こちら", new_twitter_search_process_path %></p>
