@@ -53,7 +53,8 @@ class TwitterSearchProcessesController < ApplicationController
 
   def auth_url
     client_id = Rails.application.credentials.twitter.dig(:oauth, :client_id)
-    redirect_uri = CGI.escape(Rails.application.credentials.twitter.dig(:oauth, :callback_url))
+    url = ENV["TWITTER_CALLBACK"] || Rails.application.credentials.twitter.dig(:oauth, :callback_url)
+    redirect_uri = CGI.escape(url)
     scopes = "tweet.read%20users.read%20like.read%20follows.read%20follows.write%20offline.access"
 
     "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=#{client_id}&redirect_uri=#{redirect_uri}&scope=#{scopes}&state=abc&code_challenge=abc&code_challenge_method=plain"
