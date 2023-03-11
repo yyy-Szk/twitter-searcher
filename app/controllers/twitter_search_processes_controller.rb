@@ -8,8 +8,21 @@ class TwitterSearchProcessesController < ApplicationController
   end
 
   def show
-    @twitter_search_process_id = params[:id]
+    twitter_search_process = TwitterSearchProcess.find(params[:id])
+    @twitter_search_process_id = twitter_search_process.id
     @auth_url = auth_url
+
+    respond_to do |format|
+      format.html
+      format.csv do
+        @twitter_search_result_ids =
+          TwitterSearchResult.where(twitter_search_process_id: @twitter_search_process_id).order(:id).pluck(:id)
+        @process_type = twitter_search_process.process_type
+        @first_condition = twitter_search_process.twitter_search_conditions.first
+
+        send_data render_to_string, filename: "result_#{Time.zone.now.strftime("%Y%m%d%H%M%S")}.csv", type: :csv
+      end
+    end
   end
 
   def json_data

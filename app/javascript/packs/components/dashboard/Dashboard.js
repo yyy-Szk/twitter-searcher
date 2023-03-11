@@ -83,7 +83,8 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const mdTheme = createTheme();
 
 function DashboardContent(
-  { title, authToken, specifiedPage, jsonData, pageIndex, setPageIndex, authUrl, activeProcessId, needAuth }
+  { title, authToken, specifiedPage, jsonData, pageIndex, setPageIndex, authUrl, activeProcessId,
+    needAuth, searchProcessId }
 ) {
   const [open, setOpen] = React.useState(false);
   const [pageContainer, setPageContainer] = React.useState(specifiedPage || "search-users");
@@ -111,7 +112,7 @@ function DashboardContent(
       case "search-users":
         return <SearchUsersContainer authToken={authToken} inProgress={inProgress} setInProgress={setInProgress} activeProcessId={activeProcessId} />
       case "show-result":
-        return <ShowResultContainer jsonData={jsonData} pageIndex={pageIndex} setPageIndex={setPageIndex} authUrl={authUrl} />
+        return <ShowResultContainer jsonData={jsonData} pageIndex={pageIndex} setPageIndex={setPageIndex} authUrl={authUrl} searchProcessId={searchProcessId} />
     }
   })()
 
@@ -203,7 +204,8 @@ function DashboardContent(
 }
 
 export default function Dashboard(
-  { title, authToken, specifiedPage, jsonData, pageIndex, setPageIndex, authUrl, activeProcessId, needAuth }
+  { title, authToken, specifiedPage, jsonData, pageIndex, setPageIndex, authUrl, activeProcessId,
+    needAuth, searchProcessId }
 ) {
   return (
     <DashboardContent
@@ -216,6 +218,7 @@ export default function Dashboard(
       authUrl={authUrl}
       activeProcessId={activeProcessId}
       needAuth={needAuth}
+      searchProcessId={searchProcessId}
     />
   )
 }

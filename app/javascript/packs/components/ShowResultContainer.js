@@ -124,11 +124,10 @@ const NarrowConditionGridItem = ({ narrow_conditions }) => {
   )
 }
 
-const ShowResultContainer = ({ jsonData, pageIndex, setPageIndex, authUrl }) => {
+const ShowResultContainer = ({ jsonData, pageIndex, setPageIndex, authUrl, searchProcessId }) => {
   if (!Object.keys(jsonData).length) return <></>
 
   const process = jsonData.process
-
   return (
     <><ThemeProvider theme={theme}>
       <Grid container>
@@ -146,22 +145,33 @@ const ShowResultContainer = ({ jsonData, pageIndex, setPageIndex, authUrl }) => 
           <Typography variant="p">
             <Typography variant="span">※ ユーザー検索の場合、ツイートを非表示にしているアカウント（鍵アカウント）は、検索結果に含まれません。</Typography>
           </Typography>
+          <Typography variant="p">
+            <Typography variant="span">※ ダウンロードしたCSVの文字コードは Shift_JIS となります。</Typography>
+          </Typography>
+
         </Box>
       </Box>
-      
-      <Box mb={1}>
+
+      <Box mb={3}>
         <Typography variant="p">
           進行状況: {(process.status === "will_finish") ? "中断処理を実行中です..." :
                     (process.progress_rate === 100) ? `取得完了${!!process.error_message ? `(${process.error_message})` : ""}` : "現在取得中..." } /
           表示数: {jsonData.results.length} /
           ヒット数: {jsonData.total_count}
           {
-            (process.progress_rate != 100 && process.status != "will_finish") &&
-            <a data-method='put' href={`/twitter_search_processes/${process.id}`}>
-              <Typography variant="span" sx={{ ml: 2 }}>
-                (処理を中断する)
-              </Typography>
-            </a>
+            (process.status != "will_finish") &&
+              (process.progress_rate === 100 ?
+                <Typography variant="span" sx={{ ml: 2 }}>
+                  <Link href={`/twitter_search_processes/${searchProcessId}.csv`} sx={{ cursor: "pointer" }}>
+                    (csvをダウンロード)
+                  </Link>
+                </Typography>
+              :
+                <a data-method='put' href={`/twitter_search_processes/${process.id}`}>
+                  <Typography variant="span" sx={{ ml: 2 }}>
+                    (処理を中断する)
+                  </Typography>
+                </a>)
           }
         </Typography>
       </Box>
