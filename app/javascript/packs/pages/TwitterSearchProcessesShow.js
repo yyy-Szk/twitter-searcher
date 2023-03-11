@@ -26,6 +26,7 @@ const TwitterSearchProcessesShow = ({ dataset: { authToken, searchProcessId, aut
         authUrl={authUrl}
         activeProcessId={activeProcessId}
         needAuth={needAuth}
+        searchProcessId={searchProcessId}
       />
     </>
   );
