@@ -161,11 +161,13 @@ const ShowResultContainer = ({ jsonData, pageIndex, setPageIndex, authUrl, searc
           {
             (process.status != "will_finish") &&
               (process.progress_rate === 100 ?
-                <Typography variant="span" sx={{ ml: 2 }}>
-                  <Link href={`/twitter_search_processes/${searchProcessId}.csv`} sx={{ cursor: "pointer" }}>
-                    (csvをダウンロード)
-                  </Link>
-                </Typography>
+                ( !!jsonData.results.length &&
+                  <Typography variant="span" sx={{ ml: 2 }}>
+                    <Link href={`/twitter_search_processes/${searchProcessId}.csv`} sx={{ cursor: "pointer" }}>
+                      (csvをダウンロード)
+                    </Link>
+                  </Typography>
+                )
               :
                 <a data-method='put' href={`/twitter_search_processes/${process.id}`}>
                   <Typography variant="span" sx={{ ml: 2 }}>
