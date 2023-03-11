@@ -15,7 +15,7 @@ const mainConditionMaxSize = 5
 const narrowConditionMinSize = 0
 const narrowConditionMaxSize = 5
 
-const MainConditionContainer = () => {
+const MainConditionContainer = ({ validationInfo }) => {
   const [type, setType] = React.useState("FollowingUser")
   const handleChange = (e) => setType(e.target.value)
 
@@ -39,6 +39,10 @@ const MainConditionContainer = () => {
         placeholder="検索したいユーザーのURLを入力"
         autoFocus
         style={{ width: 400, maxWidth: "100%" }}
+        error={validationInfo.contentInputError}
+        inputProps={{ required: true }}
+        inputRef={validationInfo.contentInputRef}
+        helperText={validationInfo.contentInputRef?.current?.validationMessage}
       />
       <Typography
         component="span"
@@ -58,9 +62,14 @@ const MainConditionContainer = () => {
           </Typography>
           <TextField
             required
+            type="number"
             name="search_conditions[][num_of_days]"
             autoFocus
-            style={{ width: 70, maxWidth: "100%" }}
+            style={{ maxWidth: "100%" }}
+            error={validationInfo.numOfDaysInputError}
+            inputProps={{ required: true, min: 1, max: 365 }}
+            inputRef={validationInfo.numOfDaysInputRef}
+            helperText={validationInfo.numOfDaysInputRef?.current?.validationMessage}
           />
           <Typography component="span" style={{ verticalAlign: "bottom", margin: "0 10px" }}>
             日）
@@ -71,7 +80,7 @@ const MainConditionContainer = () => {
   )
 }
 
-const NarrowConditionContainer = () => {
+const NarrowConditionContainer = ({ validationInfo }) => {
   const [type, setType] = React.useState("FollowingUser")
   const handleChange = (e) => setType(e.target.value)
 
@@ -99,6 +108,10 @@ const NarrowConditionContainer = () => {
         placeholder="検索したいユーザーのURLを入力"
         autoFocus
         style={{ width: 400, maxWidth: "100%" }}
+        error={validationInfo.contentInputError}
+        inputProps={{ required: true }}
+        inputRef={validationInfo.contentInputRef}
+        helperText={validationInfo.contentInputRef?.current?.validationMessage}
       />
       <Typography
         component="span"
@@ -118,9 +131,14 @@ const NarrowConditionContainer = () => {
           </Typography>
           <TextField
             required
+            type="number"
             name="narrow_conditions[][num_of_days]"
             autoFocus
-            style={{ width: 70, maxWidth: "100%" }}
+            style={{ maxWidth: "100%" }}
+            error={validationInfo.numOfDaysInputError}
+            inputProps={{ required: true, min: 1, max: 365 }}
+            inputRef={validationInfo.numOfDaysInputRef}
+            helperText={validationInfo.numOfDaysInputRef?.current?.validationMessage}
           />
           <Typography component="span" style={{ verticalAlign: "bottom", margin: "0 10px" }}>
             日）
@@ -132,15 +150,67 @@ const NarrowConditionContainer = () => {
 }
 
 const SearchUsersForm = ({ authToken, setInProgress }) => {
+  const [mainConditionCount, setMainConditionCount] = React.useState(mainConditionMinSize)
+  const [narrowConditionCount, setNarrowConditionCount] = React.useState(narrowConditionMinSize)
+  const [removeFollowingUser, setRemoveFollowingUser] = React.useState(false)
+
+  const mainValidationInfo = [...Array(mainConditionMaxSize)].map((_) => {
+    const contentInputRef = React.useRef(null);
+    const numOfDaysInputRef = React.useRef(null);
+    const [contentInputError, setContentInputError] = React.useState(false);
+    const [numOfDaysInputError, setNumOfDaysInputError] = React.useState(false);
+
+    return { contentInputRef, numOfDaysInputRef, contentInputError, setContentInputError,
+             numOfDaysInputError, setNumOfDaysInputError }
+  })
+
+  const narrowValidationInfo = [...Array(narrowConditionMaxSize)].map((_) => {
+    const contentInputRef = React.useRef(null);
+    const numOfDaysInputRef = React.useRef(null);
+    const [contentInputError, setContentInputError] = React.useState(false);
+    const [numOfDaysInputError, setNumOfDaysInputError] = React.useState(false);
+
+    return { contentInputRef, numOfDaysInputRef, contentInputError, setContentInputError,
+             numOfDaysInputError, setNumOfDaysInputError }
+  })
+
+  const validate = () => {
+    const mainConditionValidations = [...Array(mainConditionCount)].map((_, i) => {
+      const { contentInputRef, numOfDaysInputRef, setContentInputError, setNumOfDaysInputError } = mainValidationInfo[i]
+      const [contentRef, numOfDaysRef] = [contentInputRef.current, numOfDaysInputRef.current]
+
+      const contentInputResult = contentRef.validity.valid ? false : true
+      const numOfDaysInputResult = !!numOfDaysRef ? (numOfDaysRef.validity.valid ? false : true) : false
+
+      setContentInputError(contentInputResult)
+      setNumOfDaysInputError(numOfDaysInputResult)
+
+      return (!contentInputResult && !numOfDaysInputResult)
+    })
+
+    const narrowConditionValidations = [...Array(narrowConditionCount)].map((_, i) => {
+      const { contentInputRef, numOfDaysInputRef, setContentInputError, setNumOfDaysInputError } = narrowValidationInfo[i]
+      const [contentRef, numOfDaysRef] = [contentInputRef.current, numOfDaysInputRef.current]
+
+      const contentInputResult = contentRef.validity.valid ? false : true
+      const numOfDaysInputResult = !!numOfDaysRef ? (numOfDaysRef.validity.valid ? false : true) : false
+
+      setContentInputError(contentInputResult)
+      setNumOfDaysInputError(numOfDaysInputResult)
+
+      return (!contentInputResult && !numOfDaysInputResult)
+    })
+
+    return (mainConditionValidations.every(v => v) && narrowConditionValidations.every(v => v))
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validate()) return
 
     setInProgress(true);
     document.getElementById('users-form').submit();
   };
-  const [mainConditionCount, setMainConditionCount] = React.useState(mainConditionMinSize)
-  const [narrowConditionCount, setNarrowConditionCount] = React.useState(narrowConditionMinSize)
-  const [removeFollowingUser, setRemoveFollowingUser] = React.useState(false)
 
   return (
     <>
@@ -150,7 +220,7 @@ const SearchUsersForm = ({ authToken, setInProgress }) => {
       <Box component="form" id="users-form" onSubmit={handleSubmit} noValidate action="/twitter_search_processes" method="post" sx={{ mt: 1 }} target="_blank">
         {
           [...Array(mainConditionCount)].map((_, i) =>
-            <MainConditionContainer key={`main-condition-${i}`} containerKey={""} />
+            <MainConditionContainer key={`main-condition-${i}`} validationInfo={mainValidationInfo[i]} />
           )
         }
         
@@ -167,7 +237,7 @@ const SearchUsersForm = ({ authToken, setInProgress }) => {
 
         {
           [...Array(narrowConditionCount)].map((_, i) =>
-            <NarrowConditionContainer key={`narrow-condition-${i}`} />
+            <NarrowConditionContainer key={`narrow-condition-${i}`} validationInfo={narrowValidationInfo[i]} />
           )
         }
 

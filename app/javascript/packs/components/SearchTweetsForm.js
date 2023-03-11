@@ -8,17 +8,35 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import AuthenticityTokenInput from './AuthenticityTokenInput';
 
 const SearchTweetsForm = ({ authToken, setInProgress }) => {
+  const contentInputRef = React.useRef(null);
+  const numOfDaysInputRef = React.useRef(null);
+  const [contentInputError, setContentInputError] = React.useState(false);
+  const [numOfDaysInputError, setNumOfDaysInputError] = React.useState(false);
+
+  const validate = () => {
+    const contentRef = contentInputRef.current;
+    const numOfDaysRef = numOfDaysInputRef.current;
+    if (!contentRef || !numOfDaysRef) return
+
+    contentRef.validity.valid ? setContentInputError(false) : setContentInputError(true)
+    numOfDaysRef.validity.valid ? setNumOfDaysInputError(false) : setNumOfDaysInputError(true)
+
+    return  (contentRef.validity.valid && numOfDaysRef.validity.valid)
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validate()) return
 
     setInProgress(true);
     document.getElementById('tweets-form').submit();
   };
 
+
   return (
     <>
       {/* こういうページのデスクリプション的なやつは別のpagerにする */}
-      <Typography component="p" mb={4}>ユーザーのツイートを、いいね/リツイートの多い順に取得します</Typography>
+      <Typography component="p" mb={4}>ユーザーのツイートを、いいね/リツイートの多い順に取得します（最大365日まで）</Typography>
 
       <Box component="form" id="tweets-form" onSubmit={handleSubmit} noValidate action="/twitter_search_processes" method="post" sx={{ mt: 1 }} target="_blank">
         <Box>
@@ -29,6 +47,10 @@ const SearchTweetsForm = ({ authToken, setInProgress }) => {
             placeholder="検索したいユーザーのURLを入力"
             autoFocus
             style={{ maxWidth: "100%", width: 400 }}
+            error={contentInputError}
+            inputProps={{ required: true }}
+            inputRef={contentInputRef}
+            helperText={contentInputRef?.current?.validationMessage}
           />
           <Typography
             component="span"
@@ -39,10 +61,15 @@ const SearchTweetsForm = ({ authToken, setInProgress }) => {
 
           <TextField
             required
+            type="number"
             name="search_conditions[][num_of_days]"
             placeholder="日数を入力"
             autoComplete="num-of-days"
             style={{ maxWidth: "100%" }}
+            error={numOfDaysInputError}
+            inputProps={{ required: true, min: 1, max: 365 }}
+            inputRef={numOfDaysInputRef}
+            helperText={numOfDaysInputRef?.current?.validationMessage}
           />
           <Typography
             component="span"
